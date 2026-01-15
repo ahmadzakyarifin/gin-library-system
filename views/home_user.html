@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gatherbooks - Your Digital Library</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+      .hero-shadow {
+        box-shadow: 0 25px 50px -12px rgba(59, 130, 246, 0.35),
+                    0 10px 10px -5px rgba(0, 0, 0, 0.05);
+      }
+
+      .book-category-wrapper {
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        padding: 60px;
+      }
+
+      .book-card {
+        transition: transform 0.3s, box-shadow 0.3s;
+        border: 1px solid #f3f4f6;
+      }
+      .book-card:hover {
+        box-shadow: 0 15px 30px rgba(59,130,246,0.1);
+      }
+      [id^="category-"] {
+        scroll-margin-top: 140px;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen bg-[url('/img/background.svg')] bg-no-repeat bg-center bg-cover font-sans">
+
+
+    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-xl shadow-xl border-b border-gray-100">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-20">
+          <div class="flex-shrink-0">
+            <img src="/img/getherbooks.png" alt="Gatherbooks" class="h-12 " />
+          </div>
+
+          <div class="hidden lg:flex items-center flex-1 justify-center px-8">
+            <form method="GET" action="/home#search-results" class="flex-1 max-w-lg relative flex gap-2">
+              <input
+                type="text"
+                name="search"
+                value="{{.Search}}"
+                placeholder="Search title or category..."
+                class="scroll-margin-top:1 w-full pl-12 pr-4 py-3 rounded-2xl border border-blue-400 focus:outline-none focus:ring-4 focus:ring-blue-100 bg-white transition-shadow shadow-inner shadow-blue-50"
+              />
+              <i class="bi bi-search absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-500 text-lg"></i>
+              
+              <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition">
+                Filter
+              </button>
+
+              <a href="/home" class="flex items-center justify-center px-4 py-2 bg-gray-300 text-gray-800 rounded-xl font-bold hover:bg-gray-400 transition">
+                Reset
+              </a>
+            </form>
+          </div>
+
+
+          <div class="flex items-center gap-6">
+            <div class="hidden lg:flex items-center gap-2 bg-blue-50 p-1 rounded-xl shadow-inner">
+              <a href="/home" class="font-extrabold bg-white text-blue-600 px-4 py-2 rounded-xl shadow-md transition hover:shadow-lg">Home</a>
+              <a href="/bookings_in_user" class="font-semibold text-blue-500 hover:bg-white hover:text-blue-600 px-4 py-2 rounded-xl transition">Bookings</a>
+            </div>
+
+            <div class="flex lg:hidden items-center gap-5">
+              <a href="#" class="text-2xl text-blue-600 hover:scale-110 transition"><i class="bi bi-search"></i></a>
+              <a href="/home" class="text-2xl text-blue-600 hover:scale-110 transition"><i class="bi bi-house-door-fill"></i></a>
+              <a href="/bookings_in_user" class="text-2xl text-gray-500 hover:text-blue-600 hover:scale-110 transition"><i class="bi bi-journal-check"></i></a>
+            </div>
+
+            <div class="flex items-center gap-4">
+              <a href="/settings_user" class="text-2xl text-gray-600 hover:text-blue-600 transition hover:scale-110">
+                <i class="bi bi-gear-fill"></i>
+              </a>
+              <form action="/logout" method="POST">
+                <button type="submit" class="hidden lg:flex bg-red-500 text-white font-semibold px-4 py-2 rounded-xl hover:bg-red-600 transition shadow-lg hover:shadow-xl">Logout</button>
+                <button type="submit" class="lg:hidden text-2xl text-red-500 hover:text-red-600 hover:scale-110 transition">
+                  <i class="bi bi-box-arrow-right"></i>
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-12">
+      <section class="relative flex flex-col md:flex-row items-center justify-between max-w-6xl mx-auto py-12 px-8 rounded-3xl hero-shadow bg-gradient-to-br from-blue-600 to-indigo-700 text-white overflow-hidden mt-10 pb-24">
+        <div class="absolute inset-0 opacity-10" style="background-image: url('data:image/svg+xml;charset=utf8,%3Csvg viewBox=...')"></div>
+        <div class="relative md:w-1/2 text-center md:text-left z-10 mt-8 ml-8">
+          <h1 class="font-extrabold text-4xl md:text-6xl leading-tight drop-shadow-md">New Books, New Friends</h1>
+          <p class="mt-4 text-md text-blue-200 drop-shadow font-medium">
+            The most delightful combination to discover and connect with readers.
+          </p>
+          <a href="" target="_blank" class="inline-flex items-center px-4 py-2 bg-white text-blue-700 font-extrabold rounded-xl mt-16 shadow-xl hover:bg-gray-100 transition-transform hover:scale-[1.05] duration-300">
+            <i class="bi bi-whatsapp text-xl mr-2"></i> Join Book Club
+          </a>
+        </div>
+        <div class="relative mt-8 md:mt-0 md:w-1/2 flex justify-center z-10">
+          <img src="../img/book.jpg" alt="Person reading and learning illustration" class="w-72 md:w-96 drop-shadow-2xl rounded-3xl "/>
+        </div>
+      </section>
+
+      {{if .SearchActive}}
+      <section id="search-results" class="mt-16">
+        <div class="bg-white/70  p-20 rounded-2xl ">
+        {{if .Books}}
+        <div class="flex gap-6 overflow-x-auto no-scrollbar pb-2">
+          {{range .Books}}
+          <div class="bg-white rounded-2xl shadow-xl w-48 flex-shrink-0 flex flex-col overflow-hidden book-card hover:scale-[1.03]">
+            <div class="relative h-40 w-full">
+              <img src="{{.Img}}" alt="{{.Title}}" class="h-full w-full object-cover rounded-t-2xl"/>
+              <span class="absolute top-2 right-2 px-3 py-1 text-xs font-bold text-white rounded-full shadow-lg
+                {{if .IsBorrowed}} bg-red-500 {{else}} bg-green-500 {{end}}">
+                {{if .IsBorrowed}}Borrowed{{else}}Available{{end}}
+              </span>
+            </div>
+            <div class="p-3 flex flex-col justify-between flex-1">
+              <h4 class="font-extrabold text-gray-900 text-lg truncate">{{.Title}}</h4>
+              <a href="/view_detail_user/{{.ID}}?category={{.ID}}&search={{$.Search}}&from_home=true#category-{{.ID}}" class="w-full text-sm py-2 mt-3 rounded-xl bg-blue-600 text-white text-center hover:bg-blue-700 transition block font-bold shadow-lg">View Details</a>
+            </div>
+          </div>
+          {{end}}
+        </div>
+        </div>
+        {{else}}
+        <p class="text-gray-600 mt-4">No books found.</p>
+        {{end}}
+      </section>
+
+      {{else}}
+      <section class="mt-16">
+        <h3 class="text-2xl font-bold text-gray-900 mb-10">Featured Categories</h3>
+        <ul class="flex gap-3 overflow-x-auto no-scrollbar pb-3 justify-start md:justify-center">
+          {{range .Categories}}
+            <li class="overflow-visible flex">
+              <a href="/home#category-{{.ID}}"
+                class="px-6 py-3.5 rounded-3xl font-semibold transition-all duration-200 leading-none flex items-center justify-center
+                {{if eq $.SelectedCategory .ID}} bg-blue-700 text-white shadow-md shadow-black/10 scale-105
+                {{else}} bg-white text-black border border-black/10 hover:bg-black/5{{end}}">
+                {{.Name}}
+              </a>
+            </li>
+          {{end}}
+        </ul>
+      </section>
+
+      {{range .Categories}}
+        {{ $books := index $.BookCategory .ID }}
+        {{if $books}}
+        <section id="category-{{.ID}}" class="mt-12 flex flex-col gap-12">
+          <div class="bg-white/50 backdrop-blur-lg rounded-3xl book-category-wrapper shadow-2xl">
+            <div class="flex justify-between items-center mb-8 border-b pb-4 border-blue-200">
+              <h3 class="text-3xl font-extrabold text-gray-800">{{.Name}}</h3>
+              <a href="/all?category={{.ID}}#category-{{.ID}}"
+              class="font-bold text-blue-600 hover:text-blue-800 transition flex items-center gap-1">
+                See All <i class="bi bi-arrow-right"></i>
+              </a>
+            </div>
+
+            <div class="flex gap-8 overflow-x-auto no-scrollbar p-2 -mx-2">
+              {{range $books}}
+              <div class="bg-white rounded-2xl shadow-xl w-48 flex-shrink-0 flex flex-col overflow-hidden book-card hover:scale-[1.03]">
+                <div class="relative h-40 w-full">
+                  <img src="{{.Img}}" alt="{{.Title}}" class="h-full w-full object-cover rounded-t-2xl"/>
+                  <span class="absolute top-2 right-2 px-3 py-1 text-xs font-bold text-white rounded-full shadow-lg
+                    {{if .IsBorrowed}} bg-red-500 {{else}} bg-green-500 {{end}}">
+                    {{if .IsBorrowed}}Borrowed{{else}}Available{{end}}
+                  </span>
+                </div>
+                <div class="p-3 flex flex-col justify-between flex-1">
+                  <h4 class="font-extrabold text-gray-900 text-lg truncate">{{.Title}}</h4>
+                  <a href="/view_detail_user/{{.ID}}?category={{.CategoryId}}&from_home=true#category-{{.ID}}" class="w-full text-sm py-2 mt-3 rounded-xl bg-blue-600 text-white text-center hover:bg-blue-700 transition block font-bold shadow-lg">View Details</a>
+                </div>
+              </div>
+              {{end}}
+            </div>
+          </div>
+        </section>
+        {{end}}
+      {{end}}
+
+      {{end}}
+
+
+    </main>
+
+    <footer class="w-full bg-white/90 backdrop-blur-xl shadow-inner mt-16 text-center text-gray-600 py-6 border-t border-gray-100">
+      © 2025 Gatherbooks. All rights reserved.
+    </footer>
+  </body>
+</html>

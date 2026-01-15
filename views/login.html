@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - Getherbooks</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        @supports not ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
+            .backdrop-blur-lg { background-color: rgba(255, 255, 255, 0.85); }
+        }
+    </style>
+</head>
+<body
+    class="min-h-screen bg-[url('/img/background.svg')] bg-no-repeat bg-center bg-cover font-sans flex items-center justify-center p-4"
+>
+
+    <div class="w-full max-w-md">
+        <div class="bg-white/80 backdrop-blur-lg shadow-2xl rounded-3xl overflow-hidden p-8 sm:p-10">
+            <div class="flex flex-col justify-center items-center">
+                <img src="/img/getherbooks.png" alt="Logo" class="h-12 mb-8" />
+                
+                <form action="/login" method="post" class="space-y-6 w-full" autocomplete="off">
+
+                    <div class="relative">
+                        <i class="bi bi-envelope-fill absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input
+                            type="email"
+                            name="email"
+                            placeholder="Email"
+                            class="w-full h-12 pl-12 pr-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                            autocomplete="off"
+                        />
+                    </div>
+
+
+                    <div class="relative">
+                        <i class="bi bi-lock-fill absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input
+                            type="password"
+                            name="password"
+                            placeholder="Password"
+                            class="w-full h-12 pl-12 pr-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                            autocomplete="off"
+                        />
+                    </div>
+
+
+                    <button
+                        type="submit"
+                        class="w-full h-12 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all duration-300"
+                    >
+                        Sign In
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

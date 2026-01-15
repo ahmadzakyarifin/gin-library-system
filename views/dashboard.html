@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - Getherbooks</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <style>
+    @supports not ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
+      .backdrop-blur-lg { background-color: rgba(255, 255, 255, 0.75); }
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-[url('/img/background.svg')] bg-no-repeat bg-center bg-cover font-sans flex flex-col">
+
+<div class="flex h-screen w-full gap-6 p-6">
+
+  <aside class="bg-white/30 backdrop-blur-lg w-full md:w-64 rounded-3xl flex flex-col items-center p-4 shadow-2xl">
+    <div class="mt-5 mb-16">
+      <img src="/img/getherbooks.png" alt="Logo" class="h-12" />
+    </div>
+
+    <nav class="flex flex-col w-full space-y-2 flex-1">
+      <a href="#" class="font-semibold text-sm p-3 rounded-xl flex items-center gap-3 bg-blue-500 text-white shadow-lg">
+        <i class="bi bi-grid-1x2-fill text-xl"></i><span>Dashboard</span>
+      </a>
+      <a href="/user" class="font-semibold text-sm p-3 rounded-xl flex items-center gap-3 text-gray-700 hover:bg-white/50">
+        <i class="bi bi-people-fill text-xl"></i><span>User</span>
+      </a>
+      <a href="/categories" class="font-semibold text-sm p-3 rounded-xl flex items-center gap-3 text-gray-700 hover:bg-white/50">
+        <i class="bi bi-tags-fill text-xl"></i><span>Category</span>
+      </a>
+      <a href="/book" class="font-semibold text-sm p-3 rounded-xl flex items-center gap-3 text-gray-700 hover:bg-white/50">
+        <i class="bi bi-book-half text-xl"></i><span>Books</span>
+      </a>
+      <a href="/bookings" class="font-semibold text-sm p-3 rounded-xl flex items-center gap-3 text-gray-700 hover:bg-white/50">
+        <i class="bi bi-journal-check text-xl"></i><span>Bookings</span>
+      </a>
+      <a href="/settings" class="font-semibold text-sm p-3 rounded-xl flex items-center gap-3 text-gray-700 hover:bg-white/50">
+        <i class="bi bi-gear-fill text-xl"></i><span>Settings</span>
+      </a>
+    </nav>
+
+    <form action="/logout" method="POST" class="w-full mt-6">
+      <button type="submit" class="w-full font-semibold text-sm text-center p-3 rounded-xl bg-red-500 text-white hover:bg-red-600 flex items-center justify-center gap-3">
+        <i class="bi bi-box-arrow-right text-xl"></i><span>Logout</span>
+      </button>
+    </form>
+  </aside>
+
+  <main class="flex-1 flex flex-col gap-6">
+
+    <header class="bg-white/30 backdrop-blur-lg rounded-3xl h-24 flex items-center px-8 shadow-2xl">
+      <p class="text-3xl font-bold text-gray-800">Dashboard</p>
+    </header>
+
+    <section class="flex-1 bg-white/30 backdrop-blur-lg rounded-3xl p-6 flex flex-col gap-6 shadow-2xl">
+
+      <div class="w-48">
+        <label for="year" class="block font-bold mb-2 text-gray-800">Pilih Tahun:</label>
+        <select name="year"
+                id="year"
+                class="w-full p-2.5 rounded-xl border border-gray-300 shadow-sm focus:border-blue-500"
+                onchange="window.location.href='/dashboard?year='+this.value">
+
+          {{ range .Years }}
+          <option value="{{ . }}" {{ if eq $.Year . }}selected{{ end }}>
+            {{ . }}
+          </option>
+          {{ end }}
+
+        </select>
+      </div>
+
+      <div class="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <div class="lg:col-span-2 bg-white rounded-3xl shadow-2xl  flex flex-col justify-center items-center">
+          <img src="{{ .ChartImage }}" alt="Grafik Peminjaman"  />
+        </div>
+
+
+        <div class="flex flex-col gap-6">
+
+          <div class="bg-white rounded-3xl shadow-2xl p-14 flex items-center gap-4">
+            <i class="bi bi-check-circle-fill text-4xl text-green-600"></i>
+            <div>
+              <h3 class="text-lg font-semibold text-gray-600">Tepat Waktu</h3>
+              <p class="text-3xl font-bold text-gray-800">{{ .OnTime }}%</p>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-3xl shadow-2xl p-14 flex items-center gap-4">
+            <i class="bi bi-clock-history text-4xl text-red-600"></i>
+            <div>
+              <h3 class="text-lg font-semibold text-gray-600">Terlambat</h3>
+              <p class="text-3xl font-bold text-gray-800">{{ .Late }}%</p>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-3xl shadow-2xl p-14 flex items-center gap-4">
+            <i class="bi bi-cash-coin text-4xl text-yellow-600"></i>
+            <div>
+              <h3 class="text-lg font-semibold text-gray-600">Total Denda</h3>
+              <p class="text-3xl font-bold text-gray-800">
+                Rp {{ .TotalPenalty }}
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+  </main>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Settings - Gatherbooks</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+    <style>
+      @supports not (
+        (-webkit-backdrop-filter: none) or (backdrop-filter: none)
+      ) {
+        .backdrop-blur-lg {
+          background-color: rgba(255, 255, 255, 0.85);
+        }
+      }
+    </style>
+  </head>
+  <body
+    class="min-h-screen bg-[url('/img/background.svg')] bg-no-repeat bg-center bg-cover font-sans flex flex-col"
+  >
+    <!-- Navbar -->
+    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-lg shadow-md">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-20">
+
+          <div class="flex-shrink-0">
+            <a href="home_user.html">
+              <img src="/img/getherbooks.png" alt="Gatherbooks" class="h-12" />
+            </a>
+          </div>
+
+          <div class="flex items-center gap-6">
+
+            <div
+              class="hidden lg:flex items-center gap-2 bg-gray-100 p-1 rounded-xl"
+            >
+              <a
+                href="/home"
+                class="font-semibold text-gray-500 hover:bg-white hover:text-blue-600 px-4 py-2 rounded-lg transition"
+                >Home</a
+              >
+              <a
+                href="/bookings_in_user"
+                class="font-semibold text-gray-500 hover:bg-white hover:text-blue-600 px-4 py-2 rounded-lg transition"
+                >Bookings</a
+              >
+            </div>
+
+            <div class="flex lg:hidden items-center gap-5">
+              <a
+                href="/home"
+                class="text-2xl text-gray-500 hover:text-blue-600"
+                ><i class="bi bi-house-door-fill"></i
+              ></a>
+              <a
+                href="/bookings_in_user"
+                class="text-2xl text-gray-500 hover:text-blue-600"
+                ><i class="bi bi-journal-check"></i
+              ></a>
+            </div>
+            <div class="flex items-center gap-6">
+              <a href="/settings_user" class="text-2xl text-blue-600">
+                <i class="bi bi-gear-fill"></i>
+              </a>
+              <form action="/logout" method="POST">
+                <button
+                  type="submit"
+                  class="hidden lg:flex bg-red-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-red-600 transition"
+                >
+                  Logout
+                </button>
+                <button
+                  type="submit"
+                  class="lg:hidden text-2xl text-red-500 hover:text-red-600"
+                >
+                  <i class="bi bi-box-arrow-right"></i>
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+
+    <main
+      class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 flex-grow flex items-center justify-center py-12"
+    >
+      <section
+        class="bg-white/30 backdrop-blur-lg rounded-3xl shadow-2xl p-6 md:p-10 w-full"
+      >
+        <div
+          class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center justify-items-center max-w-5xl mx-auto"
+        >
+
+          <div
+            class="flex flex-col items-center gap-6 bg-white/70 rounded-3xl p-6 md:p-8 shadow-xl transform transition hover:scale-105 hover:shadow-2xl h-full w-full max-w-sm lg:max-w-[400px]"
+          >
+            <div
+              class="w-full h-full rounded-xl shadow-lg text-white p-4 relative bg-gradient-to-br from-gray-400 via-gray-500 to-gray-700 to-gray-500 flex flex-col justify-between border border-white/20"
+            >
+              <div class="flex justify-between items-start mb-3">
+                <div class="w-10 h-6 bg-yellow-200 rounded-md"></div>
+                <i class="bi bi-wifi text-sm rotate-90 opacity-80"></i>
+              </div>
+              <div
+                class="flex justify-between items-center text-sm font-semibold mb-3"
+              >
+                <div>
+                  <div class="opacity-80 text-xs">Name</div>
+                  <div class="text-base font-medium">{{ .User.Name}}</div>
+                </div>
+                <div class="text-right">
+                  <div class="opacity-80 text-xs">ID Anggota</div>
+                  <div class="text-base font-medium">{{ .User.ID}}</div>
+                </div>
+              </div>
+              <div
+                class="flex justify-between items-center pt-2 border-t border-white/30"
+              >
+                <div>
+                  <div class="text-xs opacity-80">Kartu Anggota</div>
+                  <div class="text-sm font-bold">Gatherbooks</div>
+                </div>
+                <div>
+                  <img src="/img/getherbooks.png" alt="" class="h-8" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+          <div
+            class="flex flex-col gap-6 bg-white/70 rounded-3xl p-6 md:p-8 shadow-xl transform transition hover:scale-105 hover:shadow-2xl h-full w-full max-w-sm lg:max-w-[400px] justify-center"
+          >
+            <h2 class="text-xl font-bold text-gray-800 text-center mb-5">
+              Ubah Password
+            </h2>
+            <form action="/settings_user" method="POST" class="text-center">
+                <input
+                type="text"
+                name="password"
+                placeholder="Masukkan password baru"
+                class="w-3/4 mx-auto mb-2 px-3 py-2 text-sm rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none"
+                autofocus
+                />
+                <button
+                class="w-1/4 py-2 mx-auto bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition mt-2"
+                >
+                Simpan
+                </button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+
+
+    <footer
+      class="w-full bg-white/80 backdrop-blur-lg shadow-inner text-center text-gray-600 py-6"
+    >
+      © 2025 Gatherbooks
+    </footer>
+  </body>
+</html>

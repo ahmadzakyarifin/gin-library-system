@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Loan Details - Gatherbooks</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+    <style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        @supports not ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
+            .backdrop-blur-lg { background-color: rgba(255, 255, 255, 0.85); }
+        }
+        .book-img-detail { width: 12rem; height: 18rem; } 
+    </style>
+</head>
+<body class="min-h-screen bg-[url('/img/background.svg')] bg-no-repeat bg-center bg-cover font-sans flex flex-col">
+
+<nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-lg shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-20">
+            <div class="flex-shrink-0">
+                <a href="/home"><img src="/img/getherbooks.png" alt="Gatherbooks" class="h-12" /></a>
+            </div>
+            <div class="flex items-center gap-6">
+                <div class="hidden lg:flex items-center gap-2 bg-gray-100 p-1 rounded-xl">
+                    <a href="/home" class="font-semibold text-gray-500 hover:bg-white hover:text-blue-600 px-4 py-2 rounded-lg transition">Home</a>
+                    <a href="/bookings_in_user" class="font-semibold bg-white text-blue-600 px-4 py-2 rounded-lg shadow-sm transition">Bookings</a>
+                </div>
+                <div class="flex lg:hidden items-center gap-5">
+                    <a href="/home" class="text-2xl text-gray-500 hover:text-blue-600"><i class="bi bi-house-door-fill"></i></a>
+                    <a href="/bookings_in_user" class="text-2xl text-blue-600"><i class="bi bi-journal-check"></i></a>
+                </div>
+                <div class="flex items-center gap-6">
+                    <a href="/settings_user" class="text-2xl text-gray-600 hover:text-blue-600"><i class="bi bi-gear-fill"></i></a>
+                    <form action="/logout" method="POST">
+                        <button type="submit" class="hidden lg:flex bg-red-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-red-600 transition">Logout</button>
+                        <button type="submit" class="lg:hidden text-2xl text-red-500 hover:text-red-600"><i class="bi bi-box-arrow-right"></i></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<main class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 flex-grow pt-8 pb-12">
+    <section class="bg-white/30 backdrop-blur-lg rounded-3xl shadow-2xl p-6 md:p-10 w-full">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-3xl font-bold text-gray-800">Loan Details</h2>
+            <a href="/bookings_in_user?page={{.Page}}&status={{.Status}}" class="font-semibold flex items-center gap-1 bg-red-600 p-3 rounded-xl hover:bg-red-700 transition text-white">
+                <i class="bi bi-arrow-left"></i>
+                <span>Back to List</span>
+            </a>
+        </div>
+
+        <div class=" grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+            <div class="flex flex-col items-center text-center gap-6 bg-white/70 rounded-2xl p-8 shadow-lg h-full">
+                <img src="{{.Book.Img}}" alt="{{.Book.Title}}" class="rounded-xl shadow-md book-img-detail object-cover mx-auto" />
+                <div class="w-full space-y-3 mt-4">
+                    <div class="flex flex-col bg-white rounded-xl shadow px-5 py-3 text-left">
+                        <span class="font-bold text-gray-500 text-sm">Title</span>
+                        <p class="font-semibold text-gray-800 break-words">{{.Book.Title}}</p>
+                    </div>
+                    <div class="flex flex-col bg-white rounded-xl shadow px-5 py-3 text-left">
+                        <span class="font-bold text-gray-500 text-sm">ISBN</span>
+                        <p class="font-semibold text-gray-800 break-words">{{.Book.Isbn}}</p>
+                    </div>
+                    <div class="flex flex-col bg-white rounded-xl shadow px-5 py-3 text-left">
+                        <span class="font-bold text-gray-500 text-sm">Category</span>
+                        <p class="font-semibold text-gray-800 break-words">{{.Book.CategoryName}}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <div class="bg-white/70 rounded-2xl shadow-lg p-8 flex flex-col items-center justify-center text-center">
+                    <div class="flex gap-2 items-center"><h3 class="font-bold text-gray-700">Start Date</h3><i class="bi bi-calendar-plus"></i></div>
+                    <p class="text-3xl font-bold text-gray-800 mt-2">{{.Book.StartStr}}</p>
+                </div>
+
+                <div class="bg-white/70 rounded-2xl shadow-lg p-8 flex flex-col items-center justify-center text-center">
+                    <div class="flex gap-2 items-center"><h3 class="font-bold text-gray-700">End Date</h3><i class="bi bi-calendar-x"></i></div>
+                    <p class="text-3xl font-bold text-gray-800 mt-2">{{.Book.EndStr}}</p>
+                </div>
+
+                <div class="bg-white/70 rounded-2xl shadow-lg p-10 flex flex-col items-center justify-center text-center">
+                    <div class="flex gap-2 items-center"><h3 class="font-bold text-gray-700">Actual Return Date</h3><i class="bi bi-calendar-check"></i></div>
+                    <p class="text-3xl font-bold text-gray-800 mt-2">{{.Book.ActualReturnStr}}</p>
+                </div>
+
+                <div class="bg-white/70 rounded-2xl shadow-lg p-8 flex flex-col items-center justify-center text-center">
+                    <h3 class="font-bold text-gray-700">Current Penalty</h3>
+                    {{if gt .Book.Penalty 0.0}}
+                    <p class="text-red-600 text-3xl mt-2">Rp {{.Book.Penalty}}</p>
+                    {{else}}
+                    <p class="text-green-600 text-3xl mt-2">Rp {{.Book.Penalty}}</p>
+                    {{end}}
+                </div>
+
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer class="w-full bg-white/80 backdrop-blur-lg shadow-inner text-center text-gray-600 py-6">
+    © 2025 Gatherbooks
+</footer>
+
+</body>
+</html>
