@@ -32,3 +32,11 @@ go.work.sum
 # .vscode/
 
 .air.toml
+
+
+# logs
+*.log
+
+# temp files
+temp/
+tmp/
