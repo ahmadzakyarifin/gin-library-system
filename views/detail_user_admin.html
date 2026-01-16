@@ -124,7 +124,7 @@
                     <th class="px-6 py-4">Book Title</th>
                     <th class="px-6 py-4">Start Date</th>
                     <th class="px-6 py-4">End Date</th>
-                    <th class="px-6 py-4">Actuan Return Date</th>
+                    <th class="px-6 py-4">Actual Return Date</th>
                     <th class="px-6 py-4">Status</th>
                   </tr>
                 </thead>
@@ -157,7 +157,7 @@
             <nav class="flex flex-wrap gap-2 justify-center">
               {{range .Pages}}
               <a class="px-3 py-1 rounded-lg font-semibold transition {{if eq $.Page .}}bg-blue-600 text-white{{else}}bg-gray-200 hover:bg-gray-300{{end}}"
-                href="/bookings_user/detail/2?page={{.}}&search={{$.Search}}">
+                href="/bookings_user/detail/{{$.ID}}?page={{.}}&search={{$.Search}}">
                 {{.}}
               </a>
               {{end}}
