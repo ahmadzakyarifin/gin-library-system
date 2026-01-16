@@ -32,6 +32,3 @@ go.work.sum
 # .vscode/
 
 .air.toml
-
-# Ignore generated charts
-*.png
