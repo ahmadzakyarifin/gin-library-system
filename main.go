@@ -196,12 +196,16 @@ func main() {
 		ctx.HTML(http.StatusOK, "login.html", nil)
 	})
 
-	app.POST("/login", func(c *gin.Context) {
-		email := strings.TrimSpace(c.PostForm("email"))
-		password := strings.TrimSpace(c.PostForm("password"))
+	app.POST("/login", func(ctx *gin.Context) {
+		ctx.Header("Cache-Control", "no-cache, no-store, must-revalidate")
+		ctx.Header("Pragma", "no-cache")
+		ctx.Header("Expires", "0")
+
+		email := strings.TrimSpace(ctx.PostForm("email"))
+		password := strings.TrimSpace(ctx.PostForm("password"))
 
 		if email == "" || password == "" {
-			c.String(http.StatusBadRequest, "All fields are required")
+			ctx.String(http.StatusBadRequest, "All fields are required")
 			return
 		}
 
@@ -213,7 +217,7 @@ func main() {
 		if email == adminEmail {
 			err := bcrypt.CompareHashAndPassword([]byte(adminPassHash), []byte(password))
 			if err != nil {
-				c.String(http.StatusUnauthorized, "The admin password is incorrect")
+				ctx.String(http.StatusUnauthorized, "The admin password is incorrect")
 				return
 			}
 
@@ -223,8 +227,8 @@ func main() {
 				"exp":   time.Now().Add(24 * time.Hour).Unix(),
 			}).SignedString([]byte(jwtSecret))
 
-			c.SetCookie("token", token, 86400, "/", "", false, true)
-			c.Redirect(http.StatusFound, "/user")
+			ctx.SetCookie("token", token, 86400, "/", "", false, true)
+			ctx.Redirect(http.StatusFound, "/user")
 			return
 		}
 
@@ -233,18 +237,18 @@ func main() {
 			Scan(&user.ID, &user.Name, &user.Email, &user.Password, &user.IsActive, &user.Role)
 
 		if err != nil {
-			c.String(http.StatusUnauthorized, "Email not found")
+			ctx.String(http.StatusUnauthorized, "Email not found")
 			return
 		}
 
 		if user.IsActive == 0 {
-			c.String(http.StatusForbidden, "Your account is not active")
+			ctx.String(http.StatusForbidden, "Your account is not active")
 			return
 		}
 
 		err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 		if err != nil {
-			c.String(http.StatusUnauthorized, "Incorrect password")
+			ctx.String(http.StatusUnauthorized, "Incorrect password")
 			return
 		}
 
@@ -257,14 +261,14 @@ func main() {
 
 		fmt.Println("Token User =", token)
 
-		c.SetCookie("token", token, 86400, "/", "", false, true)
+		ctx.SetCookie("token", token, 86400, "/", "", false, true)
 
 		if user.Role == "admin" {
-			c.Redirect(http.StatusFound, "/user")
+			ctx.Redirect(http.StatusFound, "/user")
 			return
 		}
 
-		c.Redirect(http.StatusFound, "/home")
+		ctx.Redirect(http.StatusFound, "/home")
 	})
 
 	//  =================== LOGOUT ===================
@@ -351,6 +355,13 @@ func main() {
 		/* =========================
 		GENERATE BAR CHART
 		========================= */
+		chartDir := "./public/charts"
+		err = os.MkdirAll(chartDir, 0755)
+		if err != nil {
+			ctx.String(http.StatusInternalServerError, err.Error())
+			return
+		}
+
 		chartFile := fmt.Sprintf("./public/charts/chart_%d.png", year)
 		f, err := os.Create(chartFile)
 		if err != nil {
@@ -610,7 +621,7 @@ func main() {
 			page = 1
 		}
 
-		limit := 9
+		limit := 7
 		offset := (page - 1) * limit
 
 		// ============================================
@@ -649,8 +660,8 @@ func main() {
 
 		userCount := "SELECT " +
 			"Count(*) as total_user," +
-			"Count(CASE WHEN is_active = 1 THEN 1 END) as total_active," +
-			"Count(CASE WHEN is_active = 0 THEN 1 END) as total_inactive" +
+			"Count(CASE WHEN u.is_active = 1 THEN 1 END) as total_active," +
+			"Count(CASE WHEN u.is_active = 0 THEN 1 END) as total_inactive" +
 			baseQuery
 
 		var count CountsUser
@@ -666,7 +677,7 @@ func main() {
 
 		totalPage := int(math.Ceil(float64(count.CountUser) / float64(limit)))
 		if page > totalPage && totalPage != 0 {
-			ctx.Redirect(http.StatusFound, fmt.Sprintf("bookings?page=%d&search=%s", totalPage, url.QueryEscape(search)))
+			ctx.Redirect(http.StatusFound, fmt.Sprintf("/user?page=%d&search=%s&status=%s", totalPage, url.QueryEscape(search),status))
 		}
 		pages := make([]int, totalPage)
 		for i := 0; i < totalPage; i++ {
@@ -1675,6 +1686,8 @@ func main() {
 	app.POST("/bookings/return/:id", AuthMiddleware, AdminOnly, func(ctx *gin.Context) {
 			bookingID := ctx.Param("id")
 			penalty := ctx.PostForm("penalty")
+			page := ctx.PostForm("page")
+			search := ctx.PostForm("search")
 
 
 			if penalty == "" {
@@ -1695,12 +1708,12 @@ func main() {
 				ctx.String(http.StatusInternalServerError, err.Error())
 				return
 			}
-			referer := ctx.Request.Referer()
-			if referer == "" {
-				referer = "/bookings"
+			redirectURL := "/bookings"
+			if page != "" || search != "" {
+				redirectURL = "/bookings?page=" + page + "&search=" + search
 			}
 
-			ctx.Redirect(http.StatusFound, referer)
+			ctx.Redirect(http.StatusFound, redirectURL)
 	})
 
 	app.GET("/bookings_user/detail/:id", AuthMiddleware, AdminOnly, func(ctx *gin.Context) {
@@ -1839,107 +1852,107 @@ func main() {
 		})
 	})
 
-app.GET("/bookings_book/detail/:id", AuthMiddleware, AdminOnly, func(ctx *gin.Context) {
-        id, _ := strconv.Atoi(ctx.Param("id"))
-        search := ctx.DefaultQuery("search", "")
-        formatSearch := "%" + search + "%"
+	app.GET("/bookings_book/detail/:id", AuthMiddleware, AdminOnly, func(ctx *gin.Context) {
+			id, _ := strconv.Atoi(ctx.Param("id"))
+			search := ctx.DefaultQuery("search", "")
+			formatSearch := "%" + search + "%"
 
-        page, _ := strconv.Atoi(ctx.Query("page"))
-        if page < 1 { page = 1 }
-        limit := 10
-        offset := (page - 1) * limit
+			page, _ := strconv.Atoi(ctx.Query("page"))
+			if page < 1 { page = 1 }
+			limit := 10
+			offset := (page - 1) * limit
 
-        query := `
-            SELECT
-                bk.id,
-                u.name,
-                bk.start_date,
-                bk.end_date,
-                bk.actual_return_date
-            FROM bookings bk
-            JOIN users u ON u.id = bk.user_id
-            JOIN detail_bookings db ON db.booking_id = bk.id
-            WHERE db.book_id = ? AND u.name LIKE ?
-            ORDER BY bk.start_date DESC
-            LIMIT ? OFFSET ?
-        `
+			query := `
+				SELECT
+					bk.id,
+					u.name,
+					bk.start_date,
+					bk.end_date,
+					bk.actual_return_date
+				FROM bookings bk
+				JOIN users u ON u.id = bk.user_id
+				JOIN detail_bookings db ON db.booking_id = bk.id
+				WHERE db.book_id = ? AND u.name LIKE ?
+				ORDER BY bk.start_date DESC
+				LIMIT ? OFFSET ?
+			`
 
-        rows, err := db.Query(query, id, formatSearch, limit, offset)
-        if err != nil {
-            ctx.String(http.StatusInternalServerError, err.Error())
-            return
-        }
-        defer rows.Close()
+			rows, err := db.Query(query, id, formatSearch, limit, offset)
+			if err != nil {
+				ctx.String(http.StatusInternalServerError, err.Error())
+				return
+			}
+			defer rows.Close()
 
-        var bookings []*BookingDetail
-        index := offset + 1
-        location, _ := time.LoadLocation("Asia/Jakarta")
+			var bookings []*BookingDetail
+			index := offset + 1
+			location, _ := time.LoadLocation("Asia/Jakarta")
 
-        for rows.Next() {
-            bo := &BookingDetail{}
-            if err := rows.Scan(
-                &bo.ID,
-                &bo.UserName,
-                &bo.StartDate,
-                &bo.EndDate,
-                &bo.ActualReturnDate,
-            ); err != nil {
-                continue
-            }
+			for rows.Next() {
+				bo := &BookingDetail{}
+				if err := rows.Scan(
+					&bo.ID,
+					&bo.UserName,
+					&bo.StartDate,
+					&bo.EndDate,
+					&bo.ActualReturnDate,
+				); err != nil {
+					continue
+				}
 
-            bo.StartStr = bo.StartDate.In(location).Format("02 January 2006")
-            bo.EndStr = bo.EndDate.In(location).Format("02 January 2006")
-            
-            if bo.ActualReturnDate.Valid {
-                bo.ActualReturnStr = bo.ActualReturnDate.Time.In(location).Format("02 January 2006")
-            } else {
-                bo.ActualReturnStr = "-"
-            }
+				bo.StartStr = bo.StartDate.In(location).Format("02 January 2006")
+				bo.EndStr = bo.EndDate.In(location).Format("02 January 2006")
+				
+				if bo.ActualReturnDate.Valid {
+					bo.ActualReturnStr = bo.ActualReturnDate.Time.In(location).Format("02 January 2006")
+				} else {
+					bo.ActualReturnStr = "-"
+				}
 
-            bo.Index = index
-            index++
-            bookings = append(bookings, bo)
-        }
+				bo.Index = index
+				index++
+				bookings = append(bookings, bo)
+			}
 
-        queryStats := `
-            SELECT 
-                COUNT(bk.id) as total_borrowed,
-                COALESCE(SUM(bk.penalty_fee), 0) as total_fines
-            FROM bookings bk
-            JOIN users u ON u.id = bk.user_id
-            JOIN detail_bookings db ON db.booking_id = bk.id
-            WHERE db.book_id = ? AND u.name LIKE ?
-        `
-        
-        var totalTransactions int
-        var totalFines float64
-        
-        err = db.QueryRow(queryStats, id, formatSearch).Scan(&totalTransactions, &totalFines)
-        if err != nil {
-            ctx.String(http.StatusInternalServerError, err.Error())
-            return
-        }
+			queryStats := `
+				SELECT 
+					COUNT(bk.id) as total_borrowed,
+					COALESCE(SUM(bk.penalty_fee), 0) as total_fines
+				FROM bookings bk
+				JOIN users u ON u.id = bk.user_id
+				JOIN detail_bookings db ON db.booking_id = bk.id
+				WHERE db.book_id = ? AND u.name LIKE ?
+			`
+			
+			var totalTransactions int
+			var totalFines float64
+			
+			err = db.QueryRow(queryStats, id, formatSearch).Scan(&totalTransactions, &totalFines)
+			if err != nil {
+				ctx.String(http.StatusInternalServerError, err.Error())
+				return
+			}
 
-        totalPage := int(math.Ceil(float64(totalTransactions) / float64(limit)))
-        pages := make([]int, totalPage)
-        for i := 0; i < totalPage; i++ {
-            pages[i] = i + 1
-        }
+			totalPage := int(math.Ceil(float64(totalTransactions) / float64(limit)))
+			pages := make([]int, totalPage)
+			for i := 0; i < totalPage; i++ {
+				pages[i] = i + 1
+			}
 
-        stats := gin.H{
-            "TotalTransactions": totalTransactions,
-            "TotalFines":        totalFines,
-        }
+			stats := gin.H{
+				"TotalTransactions": totalTransactions,
+				"TotalFines":        totalFines,
+			}
 
-        ctx.HTML(http.StatusOK, "detail_book_admin.html", gin.H{
-            "Bookings": bookings,
-            "Pages":    pages,
-            "Page":     page,
-            "Search":   search,
-            "Stats":    stats, 
-            "ID":       id,
-        })
-    })
+			ctx.HTML(http.StatusOK, "detail_book_admin.html", gin.H{
+				"Bookings": bookings,
+				"Pages":    pages,
+				"Page":     page,
+				"Search":   search,
+				"Stats":    stats, 
+				"ID":       id,
+			})
+		})
 
 	// =============================== Settings ==========================
 	app.GET("/settings", AuthMiddleware, AdminOnly, func(ctx *gin.Context) {
@@ -2267,11 +2280,11 @@ app.GET("/bookings_book/detail/:id", AuthMiddleware, AdminOnly, func(ctx *gin.Co
 
 		queryCount := `
 			SELECT
-				COUNT(DISTINCT CASE 
-					WHEN bk.actual_return_date IS NULL THEN bk.id 
+				COUNT(CASE 
+					WHEN bk.actual_return_date IS NULL THEN db.book_id  
 				END) AS borrowed_count,
-				COUNT(DISTINCT CASE 
-					WHEN bk.actual_return_date IS NOT NULL THEN bk.id 
+				COUNT(CASE 
+					WHEN bk.actual_return_date IS NOT NULL THEN db.book_id  
 				END) AS returned_count
 			FROM bookings bk
             JOIN detail_bookings db ON db.booking_id = bk.id
@@ -2287,15 +2300,10 @@ app.GET("/bookings_book/detail/:id", AuthMiddleware, AdminOnly, func(ctx *gin.Co
 		}
 
 		queryPenalty := `
-			SELECT COALESCE(SUM(
-				GREATEST(
-					DATEDIFF(actual_return_date, end_date),
-					0
-				) * (SELECT penalty_fee FROM settings LIMIT 1)
-			), 0)
-			FROM bookings
-			WHERE actual_return_date IS NOT NULL
-			AND user_id = ?
+		SELECT COALESCE(SUM(penalty_fee), 0)
+		FROM bookings
+		WHERE actual_return_date IS NOT NULL
+		AND user_id = ?
 		`
 
 		var countPenalty float64
@@ -2390,10 +2398,7 @@ app.GET("/bookings_book/detail/:id", AuthMiddleware, AdminOnly, func(ctx *gin.Co
 				bk.start_date,
 				bk.end_date,
 				bk.actual_return_date,
-				GREATEST(
-					DATEDIFF(bk.actual_return_date, bk.end_date),
-					0
-				) * (SELECT penalty_fee FROM settings LIMIT 1) AS penalty
+				bk.penalty_fee
 			FROM bookings bk
 			JOIN detail_bookings db ON db.booking_id = bk.id
 			JOIN books b ON b.id = db.book_id
