@@ -740,7 +740,15 @@ func main() {
 
 		row, err := db.Query(query, formatSearch, formatSearch, limit, offset)
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "user_admin.html", gin.H{
+				"User":   []User{},
+				"Count":  CountsUser{},
+				"Search": search,
+				"Status": status,
+				"Pages":  []int{},
+				"Page":   page,
+				"error":  "Gagal mengambil data user: " + err.Error(),
+			})
 			return
 		}
 
@@ -749,7 +757,15 @@ func main() {
 		for row.Next() {
 			var us User
 			if err := row.Scan(&us.ID, &us.Name, &us.Email, &us.IsActive, &us.Role); err != nil {
-				ctx.String(http.StatusInternalServerError, err.Error())
+				ctx.HTML(http.StatusInternalServerError, "user_admin.html", gin.H{
+					"User":  []User{},
+					"Count":  CountsUser{},
+					"Search": search,
+					"Status": status,
+					"Pages":  []int{},
+					"Page":   page,
+					"error":  "Gagal membaca data user: " + err.Error(),
+				})
 				return
 			}
 			us.Index = i
@@ -766,12 +782,16 @@ func main() {
 		var count CountsUser
 		err = db.QueryRow(userCount, formatSearch, formatSearch).Scan(&count.CountUser, &count.CountActive, &count.CountNonactive)
 		if err != nil {
-			if err == sql.ErrNoRows {
-				ctx.String(http.StatusNotFound, "Cout Total Not Found")
+				ctx.HTML(http.StatusInternalServerError, "user_admin.html", gin.H{
+					"User":   []User{},
+					"Count":  CountsUser{},
+					"Search": search,
+					"Status": status,
+					"Pages":  []int{},
+					"Page":   page,
+					"error":  "Gagal menghitung total user: " + err.Error(),
+				})
 				return
-			}
-			ctx.String(http.StatusInternalServerError, err.Error())
-			return
 		}
 
 		totalPage := int(math.Ceil(float64(count.CountUser) / float64(limit)))
@@ -814,43 +834,81 @@ func main() {
 		search := ctx.PostForm("search")
 
 		if name == "" || email == "" || password == "" || role == "" {
-			ctx.String(http.StatusBadRequest, "All Fields are require")
+	        ctx.HTML(http.StatusBadRequest, "create_user.html", gin.H{
+				"error":  "Semua field wajib diisi",
+				"Name":   name,
+				"Email":  email,
+				"Role":   role,
+				"Page":   page,
+				"Search": search,
+			})
 			return
 		}
 
 		emailRegex := regexp.MustCompile(`^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$`)
 
 		if !emailRegex.MatchString(email) {
-			ctx.String(http.StatusBadRequest, "Invalid Email Format")
+			ctx.HTML(http.StatusBadRequest, "create_user.html", gin.H{
+				"error":  "Format email tidak valid",
+				"Name":   name,
+				"Email":  email,
+				"Role":   role,
+				"Page":   page,
+				"Search": search,
+			})
 			return
 		}
 
 		if len(password) < 6 {
-			ctx.String(http.StatusBadRequest, "Password must be 6 characters or more")
+			ctx.HTML(http.StatusBadRequest, "create_user.html", gin.H{
+				"error":  "Password minimal 6 karakter",
+				"Name":   name,
+				"Email":  email,
+				"Role":   role,
+				"Page":   page,
+				"Search": search,
+			})
 			return
 		}
 
 		hashedPass, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "create_user.html", gin.H{
+				"error":  "Terjadi kesalahan saat memproses password",
+				"Name":   name,
+				"Email":  email,
+				"Role":   role,
+				"Page":   page,
+				"Search": search,
+			})
 			return
 		}
 
 		result, err := db.Exec("INSERT INTO users (name,email,password,role) VALUES (?,?,?,?)", name, email, string(hashedPass), role)
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "create_user.html", gin.H{
+				"error":  "Gagal membuat user: " + err.Error(),
+				"Name":   name,
+				"Email":  email,
+				"Role":   role,
+				"Page":   page,
+				"Search": search,
+			})
 			return
 		}
 
 		row, err := result.RowsAffected()
-		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
-			return
-		}
-		if row == 0 {
-			ctx.String(http.StatusInternalServerError, "Failed to Create User")
-			return
-		}
+		if err != nil || row == 0 {
+				ctx.HTML(http.StatusInternalServerError, "create_user.html", gin.H{
+					"error":  "Gagal membuat user, coba lagi",
+					"Name":   name,
+					"Email":  email,
+					"Role":   role,
+					"Page":   page,
+					"Search": search,
+				})
+				return
+			}
 		ctx.Redirect(http.StatusFound, "/user?page="+page+"&search="+search)
 	})
 
@@ -871,16 +929,16 @@ func main() {
 
 		result, err := db.Exec("UPDATE users SET is_active = ? WHERE id = ?", is_active, id)
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "user_admin.html", gin.H{
+				"error": "Gagal memperbarui status user: " + err.Error(),
+			})
 			return
 		}
 		row, err := result.RowsAffected()
-		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
-			return
-		}
-		if row == 0 {
-			ctx.String(http.StatusInternalServerError, "Failed to Update Status User")
+		if err != nil || row == 0 {
+			ctx.HTML(http.StatusInternalServerError, "user_admin.html", gin.H{
+				"error": "Gagal memperbarui status user, coba lagi",
+			})
 			return
 		}
 
@@ -897,10 +955,20 @@ func main() {
 		err := db.QueryRow("SELECT id,name,email,role FROM users WHERE id = ?", id).Scan(&user.ID, &user.Name, &user.Email, &user.Role)
 		if err != nil {
 			if err == sql.ErrNoRows {
-				ctx.String(http.StatusNotFound, "User Not Found")
+				ctx.HTML(http.StatusNotFound, "user_admin.html", gin.H{
+					"User":   nil,
+					"Page":   page,
+					"Search": search,
+					"error":  "User tidak ditemukan",
+				})
 				return
 			}
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "user_admin.html", gin.H{
+				"User":   nil,
+				"Page":   page,
+				"Search": search,
+				"error":  "Terjadi kesalahan: " + err.Error(),
+			})
 			return
 		}
 
@@ -923,51 +991,53 @@ func main() {
 		emailRegex := regexp.MustCompile(`^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$`)
 
 		if !emailRegex.MatchString(email) {
-			ctx.String(http.StatusBadRequest, "Invalid Email Format")
+			ctx.HTML(http.StatusBadRequest, "update_user.html", gin.H{
+				"error": "Format email tidak valid",
+			})
 			return
 		}
 
 		if password != "" {
 			newHashedPass, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 			if err != nil {
-				ctx.String(http.StatusInternalServerError, err.Error())
+				ctx.HTML(http.StatusInternalServerError, "update_user.html", gin.H{
+					"error": "Gagal mengenkripsi password: " + err.Error(),
+				})
 				return
 			}
 
 			result, err := db.Exec("UPDATE users SET name = ? , email = ?, password = ?, role = ? WHERE id = ?", name, email, newHashedPass, role, id)
 			if err != nil {
-				ctx.String(http.StatusInternalServerError, err.Error())
+				ctx.HTML(http.StatusInternalServerError, "update_user.html", gin.H{
+					"error": "Gagal memperbarui user: " + err.Error(),
+				})
 				return
 			}
 			row, err := result.RowsAffected()
-			if err != nil {
-				ctx.String(http.StatusInternalServerError, err.Error())
+  			if err != nil || row == 0 {
+				ctx.HTML(http.StatusInternalServerError, "update_user.html", gin.H{
+					"error": "Gagal memperbarui user, coba lagi",
+				})
 				return
-			}
-			if row == 0 {
-				ctx.String(http.StatusInternalServerError, "Failed to Update User")
-				return
-			}
+		    }
 		} else {
 			result, err := db.Exec("UPDATE users SET name = ? , email = ?, role = ? WHERE id = ?", name, email, role, id)
 			if err != nil {
-				ctx.String(http.StatusInternalServerError, err.Error())
+				ctx.HTML(http.StatusInternalServerError, "update_user.html", gin.H{
+					"error": "Gagal memperbarui user: " + err.Error(),
+				})
 				return
 			}
 			row, err := result.RowsAffected()
-			if err != nil {
-				ctx.String(http.StatusInternalServerError, err.Error())
-				return
-			}
-			if row == 0 {
-				ctx.String(http.StatusInternalServerError, "Failed to Update User")
-				return
-			}
+  			if err != nil || row == 0 {
+				ctx.HTML(http.StatusInternalServerError, "update_user.html", gin.H{
+					"error": "Gagal memperbarui user, coba lagi",
+				})
+			return
 		}
 
 		ctx.Redirect(http.StatusFound, "/user?page="+page+"&search="+search)
-	})
-
+	}})
 	// ============================= Books ==============================
 	app.GET("/book", AuthMiddleware, AdminOnly, func(ctx *gin.Context) {
 		search := ctx.DefaultQuery("search", "")
