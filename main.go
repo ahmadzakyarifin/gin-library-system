@@ -205,7 +205,10 @@ func main() {
 		password := strings.TrimSpace(ctx.PostForm("password"))
 
 		if email == "" || password == "" {
-			ctx.String(http.StatusBadRequest, "All fields are required")
+			ctx.HTML(http.StatusBadRequest,"login.html",gin.H{
+				"error" : "Email dan Password wajib di isi",
+				"email" : email,
+			})
 			return
 		}
 
@@ -217,7 +220,10 @@ func main() {
 		if email == adminEmail {
 			err := bcrypt.CompareHashAndPassword([]byte(adminPassHash), []byte(password))
 			if err != nil {
-				ctx.String(http.StatusUnauthorized, "The admin password is incorrect")
+				ctx.HTML(http.StatusUnauthorized,"login.html",gin.H{
+					"error" : "Password Admin salah",
+					"email" : email,
+				})
 				return
 			}
 
@@ -237,18 +243,31 @@ func main() {
 			Scan(&user.ID, &user.Name, &user.Email, &user.Password, &user.IsActive, &user.Role)
 
 		if err != nil {
-			ctx.String(http.StatusUnauthorized, "Email not found")
+			if err == sql.ErrNoRows {
+				ctx.HTML(http.StatusUnauthorized,"login.html",gin.H{
+					"error" : "Email tidak terdaftar",
+					"email" : email,
+				})
+				return
+			}
+			ctx.String(http.StatusInternalServerError, err.Error())
 			return
 		}
 
 		if user.IsActive == 0 {
-			ctx.String(http.StatusForbidden, "Your account is not active")
+			ctx.HTML(http.StatusForbidden,"login.html",gin.H{
+				"error" : "Akun tidak aktif. Hubungi Admin.",
+				"email" : email,
+			})
 			return
 		}
 
 		err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 		if err != nil {
-			ctx.String(http.StatusUnauthorized, "Incorrect password")
+			ctx.HTML(http.StatusUnauthorized,"login.html",gin.H{
+				"error" : "Password salah",
+				"email" : email,
+			})
 			return
 		}
 
