@@ -1509,7 +1509,13 @@ func main() {
 			rows, err := db.Query(queryUser, formatSearch, limit, offset)
 			if err != nil {
 				ctx.HTML(http.StatusInternalServerError, "bookings_user.html", gin.H{
-					"error": "Gagal mengambil data user",
+					"User":             []User{},
+					"Count":            CountsUser{CountUser: 0},
+					"Pages":            []int{},
+					"SelectedCategory": filter,
+					"Page":             page,
+					"Search":           search,
+					"error":            "Gagal mengambil data user",
 				})
 				return
 			}
@@ -1520,8 +1526,13 @@ func main() {
 			for rows.Next() {
 				var u User
 				if err := rows.Scan(&u.ID, &u.Name); err != nil {
-					ctx.HTML(http.StatusInternalServerError, "bookings_user.html", gin.H{
-						"error": "Gagal memproses data user",
+					ctx.HTML(http.StatusInternalServerError, "bookings_user.html", gin.H{"User": []User{},
+						"Count":            CountsUser{CountUser: 0},
+						"Pages":            []int{},
+						"SelectedCategory": filter,
+						"Page":             page,
+						"Search":           search,
+						"error":            "Gagal memproses data user",
 					})
 					return
 				}
@@ -1533,8 +1544,13 @@ func main() {
 			var count CountsUser
 			err = db.QueryRow(countsUser, formatSearch).Scan(&count.CountUser)
 			if err != nil {
-				ctx.HTML(http.StatusInternalServerError, "bookings_user.html", gin.H{
-					"error": "Gagal menghitung data user",
+				ctx.HTML(http.StatusInternalServerError, "bookings_user.html", gin.H{"User": []User{},
+					"Count":            CountsUser{CountUser: 0},
+					"Pages":            []int{},
+					"SelectedCategory": filter,
+					"Page":             page,
+					"Search":           search,
+					"error":            "Gagal menghitung data user",
 				})
 				return
 			}
@@ -1576,8 +1592,13 @@ func main() {
 
 			rows, err := db.Query(queryBook, formatSearch, limit, offset)
 			if err != nil {
-				ctx.HTML(http.StatusInternalServerError, "bookings_book.html", gin.H{
-					"error": "Gagal mengambil data buku",
+				ctx.HTML(http.StatusInternalServerError, "bookings_book.html", gin.H{"User": []User{},
+					"Count":            CountsUser{CountUser: 0},
+					"Pages":            []int{},
+					"SelectedCategory": filter,
+					"Page":             page,
+					"Search":           search,
+					"error":            "Gagal mengambil data buku",
 				})
 				return
 			}
@@ -1588,8 +1609,13 @@ func main() {
 			for rows.Next() {
 				var b Book
 				if err := rows.Scan(&b.ID, &b.Title); err != nil {
-					ctx.HTML(http.StatusInternalServerError, "bookings_book.html", gin.H{
-						"error": "Gagal memproses data buku",
+					ctx.HTML(http.StatusInternalServerError, "bookings_book.html", gin.H{"User": []User{},
+						"Count":            CountsUser{CountUser: 0},
+						"Pages":            []int{},
+						"SelectedCategory": filter,
+						"Page":             page,
+						"Search":           search,
+						"error":            "Gagal memproses data buku",
 					})
 					return
 				}
@@ -1601,8 +1627,13 @@ func main() {
 			var count BooksCount
 			err = db.QueryRow(countBook, formatSearch).Scan(&count.BookCount)
 			if err != nil {
-				ctx.HTML(http.StatusInternalServerError, "bookings_book.html", gin.H{
-					"error": "Gagal menghitung data buku",
+				ctx.HTML(http.StatusInternalServerError, "bookings_book.html", gin.H{"User": []User{},
+					"Count":            CountsUser{CountUser: 0},
+					"Pages":            []int{},
+					"SelectedCategory": filter,
+					"Page":             page,
+					"Search":           search,
+					"error":            "Gagal menghitung data buku",
 				})
 				return
 			}
@@ -1656,8 +1687,13 @@ func main() {
 
 			rows, err := db.Query(query, argsQuery...)
 			if err != nil {
-				ctx.HTML(http.StatusInternalServerError, "bookings.html", gin.H{
-					"error": "Gagal mengambil data booking",
+				ctx.HTML(http.StatusInternalServerError, "bookings.html", gin.H{"User": []User{},
+					"Count":            CountsUser{CountUser: 0},
+					"Pages":            []int{},
+					"SelectedCategory": filter,
+					"Page":             page,
+					"Search":           search,
+					"error":            "Gagal mengambil data booking",
 				})
 				return
 			}
@@ -1669,8 +1705,13 @@ func main() {
 			for rows.Next() {
 				var bo BookingDetail
 				if err := rows.Scan(&bo.ID, &bo.UserName, &bo.BookTitles, &bo.StartDate, &bo.EndDate, &bo.ActualReturnDate); err != nil {
-					ctx.HTML(http.StatusInternalServerError, "bookings.html", gin.H{
-						"error": "Gagal memproses data booking",
+					ctx.HTML(http.StatusInternalServerError, "bookings.html", gin.H{"User": []User{},
+						"Count":            CountsUser{CountUser: 0},
+						"Pages":            []int{},
+						"SelectedCategory": filter,
+						"Page":             page,
+						"Search":           search,
+						"error":            "Gagal memproses data booking",
 					})
 					return
 				}
@@ -1687,8 +1728,13 @@ func main() {
 			var count BookingCount
 			err = db.QueryRow(countBookings, formatSearch, formatSearch).Scan(&count.BookingCount)
 			if err != nil {
-				ctx.HTML(http.StatusInternalServerError, "bookings.html", gin.H{
-					"error": "Gagal menghitung data booking",
+				ctx.HTML(http.StatusInternalServerError, "bookings.html", gin.H{"User": []User{},
+					"Count":            CountsUser{CountUser: 0},
+					"Pages":            []int{},
+					"SelectedCategory": filter,
+					"Page":             page,
+					"Search":           search,
+					"error":            "Gagal menghitung data booking",
 				})
 				return
 			}
@@ -1748,7 +1794,12 @@ func main() {
 		rowsUser, err := db.Query(queryUser)
 		if err != nil {
 			ctx.HTML(http.StatusInternalServerError, "create_bookings.html", gin.H{
-				"error": "Gagal mengambil data user",
+				"User":   []User{},
+				"Book":   []Book{},
+				"Date":   BookingDetail{},
+				"Page":   page,
+				"Search": search,
+				"error":  "Gagal mengambil data user",
 			})
 			return
 		}
@@ -1758,8 +1809,12 @@ func main() {
 		for rowsUser.Next() {
 			var u User
 			if err := rowsUser.Scan(&u.ID, &u.Name, &u.IsActive, &u.IsBorrowed); err != nil {
-				ctx.HTML(http.StatusInternalServerError, "create_bookings.html", gin.H{
-					"error": "Gagal memproses data user",
+				ctx.HTML(http.StatusInternalServerError, "create_bookings.html", gin.H{"User": []User{},
+					"Book":   []Book{},
+					"Date":   BookingDetail{},
+					"Page":   page,
+					"Search": search,
+					"error":  "Gagal memproses data user",
 				})
 				return
 			}
@@ -1768,8 +1823,12 @@ func main() {
 
 		rowsBook, err := db.Query(queryBook)
 		if err != nil {
-			ctx.HTML(http.StatusInternalServerError, "create_bookings.html", gin.H{
-				"error": "Gagal mengambil data buku",
+			ctx.HTML(http.StatusInternalServerError, "create_bookings.html", gin.H{"User": []User{},
+				"Book":   []Book{},
+				"Date":   BookingDetail{},
+				"Page":   page,
+				"Search": search,
+				"error":  "Gagal mengambil data buku",
 			})
 			return
 		}
@@ -1779,8 +1838,12 @@ func main() {
 		for rowsBook.Next() {
 			var b Book
 			if err := rowsBook.Scan(&b.ID, &b.Title, &b.IsBorrowed); err != nil {
-				ctx.HTML(http.StatusInternalServerError, "create_bookings.html", gin.H{
-					"error": "Gagal memproses data buku",
+				ctx.HTML(http.StatusInternalServerError, "create_bookings.html", gin.H{"User": []User{},
+					"Book":   []Book{},
+					"Date":   BookingDetail{},
+					"Page":   page,
+					"Search": search,
+					"error":  "Gagal memproses data buku",
 				})
 				return
 			}
@@ -1941,13 +2004,20 @@ func main() {
 		if err != nil {
 			if err == sql.ErrNoRows {
 				ctx.HTML(http.StatusNotFound, "return_bookings.html", gin.H{
-					"error": "Data booking tidak ditemukan",
+					"Bookings": BookingDetail{},
+					"Penalty":  0,
+					"Page":     page,
+					"Search":   search,
+					"error":    "Data booking tidak ditemukan",
 				})
 				return
 			}
 
-			ctx.HTML(http.StatusInternalServerError, "return_bookings.html", gin.H{
-				"error": "Gagal mengambil data booking",
+			ctx.HTML(http.StatusInternalServerError, "return_bookings.html", gin.H{"Bookings": BookingDetail{},
+				"Penalty": 0,
+				"Page":    page,
+				"Search":  search,
+				"error":   "Gagal mengambil data booking",
 			})
 			return
 		}
@@ -1964,8 +2034,11 @@ func main() {
 		if err == sql.ErrNoRows {
 			fee = 0
 		} else if err != nil {
-			ctx.HTML(http.StatusInternalServerError, "return_bookings.html", gin.H{
-				"error": "Gagal mengambil data denda",
+			ctx.HTML(http.StatusInternalServerError, "return_bookings.html", gin.H{"Bookings": BookingDetail{},
+				"Penalty": 0,
+				"Page":    page,
+				"Search":  search,
+				"error":   "Gagal mengambil data denda",
 			})
 			return
 		}
@@ -2045,6 +2118,11 @@ func main() {
 		limit := 9
 		offset := (page - 1) * limit
 
+		var bookings []*BookingDetail
+		var count BookingCount
+		var totalBooks int
+		var totalFines float64
+
 		query := `
 			SELECT
 				bk.id,
@@ -2073,13 +2151,19 @@ func main() {
 		rows, err := db.Query(query, id, formatSearch, limit, offset)
 		if err != nil {
 			ctx.HTML(http.StatusInternalServerError, "detail_user_admin.html", gin.H{
-				"error": err.Error(),
+				"Bookings": bookings,
+				"Pages":    []int{},
+				"Page":     page,
+				"Search":   search,
+				"Count":    count,
+				"Stats":    gin.H{},
+				"ID":       id,
+				"error":    err.Error(),
 			})
 			return
 		}
 		defer rows.Close()
 
-		var bookings []*BookingDetail
 		i := offset + 1
 		location, _ := time.LoadLocation("Asia/Jakarta")
 
@@ -2094,7 +2178,14 @@ func main() {
 				&bo.ActualReturnDate,
 			); err != nil {
 				ctx.HTML(http.StatusInternalServerError, "detail_user_admin.html", gin.H{
-					"error": err.Error(),
+					"Bookings": bookings,
+					"Pages":    []int{},
+					"Page":     page,
+					"Search":   search,
+					"Count":    count,
+					"Stats":    gin.H{},
+					"ID":       id,
+					"error":    err.Error(),
 				})
 				return
 			}
@@ -2114,15 +2205,29 @@ func main() {
 
 		if len(bookings) == 0 {
 			ctx.HTML(http.StatusNotFound, "detail_user_admin.html", gin.H{
-				"error": "Data peminjaman tidak ditemukan",
+				"Bookings": bookings,
+				"Pages":    []int{},
+				"Page":     page,
+				"Search":   search,
+				"Count":    count,
+				"Stats":    gin.H{},
+				"ID":       id,
+				"error":    "Data peminjaman tidak ditemukan",
 			})
 			return
 		}
-		var count BookingCount
+
 		err = db.QueryRow(queryCount, id, formatSearch).Scan(&count.BookingCount)
 		if err != nil {
 			ctx.HTML(http.StatusInternalServerError, "detail_user_admin.html", gin.H{
-				"error": err.Error(),
+				"Bookings": bookings,
+				"Pages":    []int{},
+				"Page":     page,
+				"Search":   search,
+				"Count":    count,
+				"Stats":    gin.H{},
+				"ID":       id,
+				"error":    err.Error(),
 			})
 			return
 		}
@@ -2133,7 +2238,6 @@ func main() {
 			pages[i] = i + 1
 		}
 
-		var totalBooks int
 		queryTotalBooks := `
 			SELECT COUNT(db.book_id)
 			FROM bookings bk
@@ -2144,12 +2248,18 @@ func main() {
 		err = db.QueryRow(queryTotalBooks, id, formatSearch).Scan(&totalBooks)
 		if err != nil {
 			ctx.HTML(http.StatusInternalServerError, "detail_user_admin.html", gin.H{
-				"error": err.Error(),
+				"Bookings": bookings,
+				"Pages":    pages,
+				"Page":     page,
+				"Search":   search,
+				"Count":    count,
+				"Stats":    gin.H{},
+				"ID":       id,
+				"error":    err.Error(),
 			})
 			return
 		}
 
-		var totalFines float64
 		queryTotalFines := `
 			SELECT COALESCE(SUM(penalty_fee), 0) FROM (
 				SELECT DISTINCT bk.id, bk.penalty_fee
@@ -2162,11 +2272,17 @@ func main() {
 		err = db.QueryRow(queryTotalFines, id, formatSearch).Scan(&totalFines)
 		if err != nil {
 			ctx.HTML(http.StatusInternalServerError, "detail_user_admin.html", gin.H{
-				"error": err.Error(),
+				"Bookings": bookings,
+				"Pages":    pages,
+				"Page":     page,
+				"Search":   search,
+				"Count":    count,
+				"Stats":    gin.H{},
+				"ID":       id,
+				"error":    err.Error(),
 			})
 			return
 		}
-
 		stats := gin.H{
 			"TotalTransactions": count.BookingCount,
 			"TotalBooks":        totalBooks,
@@ -2214,7 +2330,13 @@ func main() {
 		rows, err := db.Query(query, id, formatSearch, limit, offset)
 		if err != nil {
 			ctx.HTML(http.StatusInternalServerError, "detail_book_admin.html", gin.H{
-				"error": err.Error(),
+				"Bookings": []*BookingDetail{},
+				"Pages":    []int{},
+				"Page":     page,
+				"Search":   search,
+				"Stats":    gin.H{"TotalTransactions": 0, "TotalFines": 0},
+				"ID":       id,
+				"error":    err.Error(),
 			})
 			return
 		}
@@ -2234,7 +2356,13 @@ func main() {
 				&bo.ActualReturnDate,
 			); err != nil {
 				ctx.HTML(http.StatusInternalServerError, "detail_book_admin.html", gin.H{
-					"error": err.Error(),
+					"Bookings": bookings,
+					"Pages":    []int{},
+					"Page":     page,
+					"Search":   search,
+					"Stats":    gin.H{"TotalTransactions": 0, "TotalFines": 0},
+					"ID":       id,
+					"error":    err.Error(),
 				})
 				return
 			}
@@ -2254,7 +2382,13 @@ func main() {
 		}
 		if len(bookings) == 0 {
 			ctx.HTML(http.StatusNotFound, "detail_book_admin.html", gin.H{
-				"error": "Data peminjaman untuk buku ini tidak ditemukan",
+				"Bookings": []*BookingDetail{},
+				"Pages":    []int{},
+				"Page":     page,
+				"Search":   search,
+				"Stats":    gin.H{"TotalTransactions": 0, "TotalFines": 0},
+				"ID":       id,
+				"error":    "Data peminjaman untuk buku ini tidak ditemukan",
 			})
 			return
 		}
@@ -2275,7 +2409,13 @@ func main() {
 		err = db.QueryRow(queryStats, id, formatSearch).Scan(&totalTransactions, &totalFines)
 		if err != nil {
 			ctx.HTML(http.StatusInternalServerError, "detail_book_admin.html", gin.H{
-				"error": err.Error(),
+				"Bookings": bookings,
+				"Pages":    []int{},
+				"Page":     page,
+				"Search":   search,
+				"Stats":    gin.H{"TotalTransactions": 0, "TotalFines": 0},
+				"ID":       id,
+				"error":    err.Error(),
 			})
 			return
 		}
