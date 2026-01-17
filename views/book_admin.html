@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,46 +8,63 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <style>
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
     @supports not ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
-      .backdrop-blur-lg { background-color: rgba(255, 255, 255, 0.75); }
+      .backdrop-blur-lg {
+        background-color: rgba(255, 255, 255, 0.75);
+      }
     }
   </style>
 </head>
+
 <body class="min-h-screen bg-[url('/img/background.svg')] bg-no-repeat bg-center bg-cover font-sans flex flex-col">
   <div class="flex h-screen w-full gap-6 p-6">
 
 
-    <aside class="bg-white/30 backdrop-blur-lg w-full md:w-64 rounded-3xl flex-col items-center p-4 shadow-2xl hidden md:flex">
+    <aside
+      class="bg-white/30 backdrop-blur-lg w-full md:w-64 rounded-3xl flex-col items-center p-4 shadow-2xl hidden md:flex">
       <div class="mt-5 mb-16">
         <img src="/img/getherbooks.png" alt="Logo" class="h-12">
       </div>
       <nav class="flex flex-col w-full space-y-2 flex-1">
-        <a href="/dashboard" class="font-semibold text-sm p-3 rounded-xl flex items-center gap-3 text-gray-700 hover:bg-white/50 hover:shadow-md transition-all duration-200">
+        <a href="/dashboard"
+          class="font-semibold text-sm p-3 rounded-xl flex items-center gap-3 text-gray-700 hover:bg-white/50 hover:shadow-md transition-all duration-200">
           <i class="bi bi-grid-1x2-fill text-xl"></i><span>Dashboard</span>
         </a>
-        <a href="/user" class="font-semibold text-sm p-3 rounded-xl flex items-center gap-3 text-gray-700 hover:bg-white/50 hover:shadow-md transition-all duration-200">
+        <a href="/user"
+          class="font-semibold text-sm p-3 rounded-xl flex items-center gap-3 text-gray-700 hover:bg-white/50 hover:shadow-md transition-all duration-200">
           <i class="bi bi-people-fill text-xl"></i><span>User</span>
         </a>
-        <a href="/categories" class="font-semibold text-sm p-3 rounded-xl flex items-center gap-3 text-gray-700 hover:bg-white/50 hover:shadow-md transition-all duration-200">
+        <a href="/categories"
+          class="font-semibold text-sm p-3 rounded-xl flex items-center gap-3 text-gray-700 hover:bg-white/50 hover:shadow-md transition-all duration-200">
           <i class="bi bi-tags-fill text-xl"></i><span>Category</span>
         </a>
-        <a href="#" class="font-semibold text-sm p-3 rounded-xl flex items-center gap-3 bg-blue-500 text-white shadow-lg transition-transform duration-200">
+        <a href="#"
+          class="font-semibold text-sm p-3 rounded-xl flex items-center gap-3 bg-blue-500 text-white shadow-lg transition-transform duration-200">
           <i class="bi bi-book-half text-xl"></i><span>Books</span>
         </a>
-        <a href="/bookings" class="font-semibold text-sm p-3 rounded-xl flex items-center gap-3 text-gray-700 hover:bg-white/50 hover:shadow-md transition-all duration-200">
+        <a href="/bookings"
+          class="font-semibold text-sm p-3 rounded-xl flex items-center gap-3 text-gray-700 hover:bg-white/50 hover:shadow-md transition-all duration-200">
           <i class="bi bi-journal-check text-xl"></i><span>Bookings</span>
         </a>
-        <a href="/settings" class="font-semibold text-sm p-3 rounded-xl flex items-center gap-3 text-gray-700 hover:bg-white/50 hover:shadow-md transition-all duration-200">
+        <a href="/settings"
+          class="font-semibold text-sm p-3 rounded-xl flex items-center gap-3 text-gray-700 hover:bg-white/50 hover:shadow-md transition-all duration-200">
           <i class="bi bi-gear-fill text-xl"></i><span>Settings</span>
         </a>
       </nav>
       <form action="/logout" method="POST" class="w-full mt-6">
-          <button type="submit" 
-              class="w-full font-semibold text-sm text-center p-3 rounded-xl bg-red-500 text-white hover:bg-red-600 hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-3">
-              <i class="bi bi-box-arrow-right text-xl"></i><span>Logout</span>
-          </button>
+        <button type="submit"
+          class="w-full font-semibold text-sm text-center p-3 rounded-xl bg-red-500 text-white hover:bg-red-600 hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-3">
+          <i class="bi bi-box-arrow-right text-xl"></i><span>Logout</span>
+        </button>
       </form>
     </aside>
 
@@ -63,20 +81,24 @@
           <div class="relative w-full sm:w-auto">
             <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
             <input type="text" name="search" placeholder="Search by title or isbn" value="{{.Search}}"
-                   class="py-2 pl-10 pr-4 rounded-xl w-full md:w-64 border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+              class="py-2 pl-10 pr-4 rounded-xl w-full md:w-64 border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
           </div>
-          <select name="category" class="p-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500 w-full sm:w-auto">
+          <select name="category"
+            class="p-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500 w-full sm:w-auto">
             <option value="all" {{ if eq .SelectedCategory "all" }}selected{{ end }}>All Categories</option>
             {{ range .Category }}
-              <option value="{{ .ID }}" {{ if eq (printf "%v" .ID) $.SelectedCategory }}selected{{ end }}>{{ .Name }}</option>
+            <option value="{{ .ID }}" {{ if eq (printf "%v" .ID) $.SelectedCategory }}selected{{ end }}>{{ .Name }}
+            </option>
             {{ end }}
           </select>
-          <select name="status" class="p-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500 w-full sm:w-auto">
+          <select name="status"
+            class="p-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500 w-full sm:w-auto">
             <option value="all" {{ if eq .Status "all" }}selected{{end}}>All Status</option>
             <option value="available" {{ if eq .Status "available" }}selected{{end}}>Available</option>
             <option value="borrowed" {{ if eq .Status "borrowed" }}selected{{end}}>Borrowed</option>
           </select>
-          <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-xl font-semibold hover:bg-blue-600">Filter</button>
+          <button type="submit"
+            class="bg-blue-500 text-white py-2 px-4 rounded-xl font-semibold hover:bg-blue-600">Filter</button>
           <a href="/book" class="bg-gray-200 py-2 px-4 rounded-xl font-semibold hover:bg-gray-300">Reset</a>
         </div>
 
@@ -96,63 +118,77 @@
           </div>
         </div>
 
-        <a href="/book/create?page={{.Page}}&search={{.Search}}" class="bg-blue-500 text-white py-2 px-5 rounded-xl font-semibold transition hover:bg-blue-600 hover:shadow-lg flex items-center gap-2 w-full md:w-auto justify-center">
+        <a href="/book/create?page={{.Page}}&search={{.Search}}"
+          class="bg-blue-500 text-white py-2 px-5 rounded-xl font-semibold transition hover:bg-blue-600 hover:shadow-lg flex items-center gap-2 w-full md:w-auto justify-center">
           <i class="bi bi-plus-lg"></i><span>Add Book</span>
         </a>
       </form>
 
 
-     <section class="flex-1 bg-white/30 backdrop-blur-lg rounded-3xl p-6 flex flex-col gap-6 shadow-2xl relative">
-          <div class="bg-white rounded-2xl shadow-lg flex flex-col w-full flex-1 min-w-0 ">
-            <div class="ml-16 p-6 flex-1 flex flex-col -mx-2">
-              {{ if not .Book}}
-                       <tr>
-                          <td colspan="6">
-                            <div class="flex justify-center items-center h-96">
-                              No users found
-                            </div>
-                          </td>
-                        </tr>
-              {{ end }}
-              <div class="flex flex-wrap gap-10 justify-start">
-                {{range .Book}}
-                <div class="bg-white rounded-2xl shadow w-40 h-56 flex flex-col overflow-hidden hover:scale-[1.02] transition-transform">
-                  <img src="{{.Img}}" alt="{{.Img}}" class="h-28 w-full object-cover rounded-t-2xl">
-                  <div class="p-2 flex flex-col justify-between flex-1">
-                    <div>
-                      <div class="flex items-center justify-between">
-                        <h4 class="font-semibold text-gray-800 text-sm truncate">{{.Title}}</h4>
-                        <div class="p-2 rounded-full border {{ if .IsBorrowed }}bg-red-300 border-red-400{{ else }}bg-green-300 border-green-400{{ end }}"></div>
+      <section class="flex-1 bg-white/30 backdrop-blur-lg rounded-3xl p-6 flex flex-col gap-6 shadow-2xl relative">
+        {{ if .error }}
+        <div class="mb-6 flex items-center gap-3 rounded-xl bg-red-100 text-red-700 px-4 py-3">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <span class="text-sm font-medium">{{ .error }}</span>
+        </div>
+        {{ end }}
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col w-full flex-1 min-w-0 ">
+          <div class="ml-16 p-6 flex-1 flex flex-col -mx-2">
+            {{ if not .Book}}
+            <tr>
+              <td colspan="6">
+                <div class="flex justify-center items-center h-96">
+                  No book found
+                </div>
+              </td>
+            </tr>
+            {{ end }}
+            <div class="flex flex-wrap gap-10 justify-start">
+              {{range .Book}}
+              <div
+                class="bg-white rounded-2xl shadow w-40 h-56 flex flex-col overflow-hidden hover:scale-[1.02] transition-transform">
+                <img src="{{.Img}}" alt="{{.Img}}" class="h-28 w-full object-cover rounded-t-2xl">
+                <div class="p-2 flex flex-col justify-between flex-1">
+                  <div>
+                    <div class="flex items-center justify-between">
+                      <h4 class="font-semibold text-gray-800 text-sm truncate">{{.Title}}</h4>
+                      <div
+                        class="p-2 rounded-full border {{ if .IsBorrowed }}bg-red-300 border-red-400{{ else }}bg-green-300 border-green-400{{ end }}">
                       </div>
-                      <p class="text-xs text-gray-600 truncate">Kategori: {{.CategoryName}}</p>
-                      <p class="text-xs text-gray-600 truncate">ISBN: {{.Isbn}}</p>
                     </div>
-                    <div class="flex gap-1 mt-1">
-                      <a href="/book/update/{{.ID}}?page={{$.Page}}&search={{$.Search}}" class="flex-1 text-xs py-[3px] rounded-full border border-gray-200 text-center hover:bg-gray-100 transition">Edit</a>
-                      <form action="/book/delete/{{.ID}}" method="POST" class="flex-1">
-                        <input type="hidden" name="page" value="{{$.Page}}">
-                        <input type="hidden" name="search" value="{{$.Search}}">
-                        <button type="submit" class="w-full text-xs py-[3px] rounded-full border border-red-300 text-red-600 hover:bg-red-50 transition">Del</button>
-                      </form>
-                    </div>
+                    <p class="text-xs text-gray-600 truncate">Kategori: {{.CategoryName}}</p>
+                    <p class="text-xs text-gray-600 truncate">ISBN: {{.Isbn}}</p>
+                  </div>
+                  <div class="flex gap-1 mt-1">
+                    <a href="/book/update/{{.ID}}?page={{$.Page}}&search={{$.Search}}"
+                      class="flex-1 text-xs py-[3px] rounded-full border border-gray-200 text-center hover:bg-gray-100 transition">Edit</a>
+                    <form action="/book/delete/{{.ID}}" method="POST" class="flex-1">
+                      <input type="hidden" name="page" value="{{$.Page}}">
+                      <input type="hidden" name="search" value="{{$.Search}}">
+                      <button type="submit"
+                        class="w-full text-xs py-[3px] rounded-full border border-red-300 text-red-600 hover:bg-red-50 transition">Del</button>
+                    </form>
                   </div>
                 </div>
-                {{end}}
               </div>
-            </div>
-
-            <div class="p-4 border-t border-gray-200">
-              <nav class="flex flex-wrap gap-2 justify-center">
-                  {{range .Pages}}
-                    <a class="px-3 py-1 rounded-lg font-semibold transition {{if eq $.Page .}}bg-blue-600 text-white{{else}}bg-gray-200 hover:bg-gray-300{{end}}" href="/book?page={{.}}&search={{$.Search}}">
-                     {{.}}
-                    </a>
-                  {{end}}
-              </nav>
+              {{end}}
             </div>
           </div>
+
+          <div class="p-4 border-t border-gray-200">
+            <nav class="flex flex-wrap gap-2 justify-center">
+              {{range .Pages}}
+              <a class="px-3 py-1 rounded-lg font-semibold transition {{if eq $.Page .}}bg-blue-600 text-white{{else}}bg-gray-200 hover:bg-gray-300{{end}}"
+                href="/book?page={{.}}&search={{$.Search}}">
+                {{.}}
+              </a>
+              {{end}}
+            </nav>
+          </div>
+        </div>
       </section>
     </main>
   </div>
 </body>
+
 </html>
