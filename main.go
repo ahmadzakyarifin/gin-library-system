@@ -298,7 +298,9 @@ func main() {
 	})
 	// =============== FORBIDDIN =========================
 	app.GET("/forbidden", func(ctx *gin.Context) {
-		ctx.String(http.StatusForbidden, "Access Denied: Not an admin")
+		ctx.HTML(http.StatusForbidden, "forbidden.html", gin.H{
+        "error": "Akses ditolak: Anda bukan admin",
+  	  })
 	})
 
 	// ================= DASHBOARD ==================

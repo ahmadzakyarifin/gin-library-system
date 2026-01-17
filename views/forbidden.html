@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Akses Ditolak</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="flex items-center justify-center min-h-screen bg-gray-100">
+  <div class="bg-white p-10 rounded-xl shadow-lg text-center max-w-md">
+    <i class="bi bi-exclamation-triangle-fill text-red-500 text-4xl mb-4"></i>
+    <h1 class="text-2xl font-bold mb-2">Akses Ditolak</h1>
+    <p class="text-red-700 mb-4">{{ .error }}</p>
+    <a href="/login" class="text-blue-600 hover:underline">Kembali ke Login</a>
+  </div>
+</body>
+</html>
