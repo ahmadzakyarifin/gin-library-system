@@ -1321,7 +1321,10 @@ func main() {
 		rows, err := db.Query("SELECT id, name FROM categories")
 		if err != nil {
 			ctx.HTML(http.StatusInternalServerError, "create_book.html", gin.H{
-				"error": "Terjadi kesalahan saat mengambil kategori: " + err.Error(),
+				"Categories": []Categories{},
+				"Page":       page,
+				"Search":     search,
+				"error":      "Terjadi kesalahan saat mengambil kategori: " + err.Error(),
 			})
 			return
 		}
@@ -1331,7 +1334,10 @@ func main() {
 			var cat Categories
 			if err := rows.Scan(&cat.ID, &cat.Name); err != nil {
 				ctx.HTML(http.StatusInternalServerError, "create_book.html", gin.H{
-					"error": "Terjadi kesalahan saat memproses kategori: " + err.Error(),
+					"Categories": []Categories{},
+					"Page":       page,
+					"Search":     search,
+					"error":      "Terjadi kesalahan saat memproses kategori: " + err.Error(),
 				})
 				return
 			}
@@ -1386,19 +1392,34 @@ func main() {
 		if err != nil {
 			if err == sql.ErrNoRows {
 				ctx.HTML(http.StatusNotFound, "update_book.html", gin.H{
-					"error": "Buku tidak ditemukan",
+					"Book":       Book{},
+					"Categories": []Categories{},
+					"Page":       page,
+					"Search":     search,
+					"error":      "Buku tidak ditemukan",
 				})
+				return
 			}
 			ctx.HTML(http.StatusInternalServerError, "update_book.html", gin.H{
-				"error": "Terjadi kesalahan: " + err.Error(),
+				"Book":       Book{},
+				"Categories": []Categories{},
+				"Page":       page,
+				"Search":     search,
+				"error":      "Terjadi kesalahan: " + err.Error(),
 			})
+			return
 		}
 
 		row, err := db.Query("SELECT id, name FROM categories")
 		if err != nil {
 			ctx.HTML(http.StatusInternalServerError, "update_book.html", gin.H{
-				"error": "Terjadi kesalahan: " + err.Error(),
+				"Book":       book,
+				"Categories": []Categories{},
+				"Page":       page,
+				"Search":     search,
+				"error":      "Terjadi kesalahan: " + err.Error(),
 			})
+			return
 		}
 
 		var categories []Categories
@@ -1406,8 +1427,13 @@ func main() {
 			var cat Categories
 			if err := row.Scan(&cat.ID, &cat.Name); err != nil {
 				ctx.HTML(http.StatusInternalServerError, "update_book.html", gin.H{
-					"error": "Terjadi kesalahan: " + err.Error(),
+					"Book":       book,
+					"Categories": []Categories{},
+					"Page":       page,
+					"Search":     search,
+					"error":      "Terjadi kesalahan: " + err.Error(),
 				})
+				return
 			}
 			categories = append(categories, cat)
 		}
