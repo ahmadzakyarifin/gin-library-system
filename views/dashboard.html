@@ -58,6 +58,14 @@
 
     <section class="flex-1 bg-white/30 backdrop-blur-lg rounded-3xl p-6 flex flex-col gap-6 shadow-2xl">
 
+      {{ if .error }}
+      <div class="mb-4 rounded-xl bg-red-100 text-red-700 px-4 py-3 flex items-center gap-2">
+        <i class="bi bi-exclamation-triangle-fill text-xl"></i>
+        <span class="text-sm font-medium">{{ .error }}</span>
+      </div>
+      {{ end }}
+
+
       <div class="w-48">
         <label for="year" class="block font-bold mb-2 text-gray-800">Pilih Tahun:</label>
         <select name="year"

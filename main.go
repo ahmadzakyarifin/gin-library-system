@@ -318,7 +318,9 @@ func main() {
 
 		rowsYear, err := db.Query(queryYear)
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "dashboard.html", gin.H{
+				"error": "Gagal memuat data tahun. Silakan coba lagi nanti.",
+			})
 			return
 		}
 		defer rowsYear.Close()
@@ -327,7 +329,9 @@ func main() {
 		for rowsYear.Next() {
 			var y int
 			if err := rowsYear.Scan(&y); err != nil {
-				ctx.String(http.StatusInternalServerError, err.Error())
+				ctx.HTML(http.StatusInternalServerError, "dashboard.html", gin.H{
+					"error": "Gagal memproses data tahun. Silakan coba lagi nanti.",
+				})				
 				return
 			}
 			years = append(years, y)
@@ -358,7 +362,9 @@ func main() {
 
 		rowsChart, err := db.Query(queryChart, year)
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "dashboard.html", gin.H{
+				"error": "Gagal memuat data chart. Silakan coba lagi nanti.",
+			})
 			return
 		}
 		defer rowsChart.Close()
@@ -367,7 +373,9 @@ func main() {
 		for rowsChart.Next() {
 			var month, total int
 			if err := rowsChart.Scan(&month, &total); err != nil {
-				ctx.String(http.StatusInternalServerError, err.Error())
+				ctx.HTML(http.StatusInternalServerError, "dashboard.html", gin.H{
+					"error": "Gagal memproses data chart. Silakan coba lagi nanti.",
+				})
 				return
 			}
 			chartData[month-1] = float64(total)
@@ -379,14 +387,18 @@ func main() {
 		chartDir := "./public/charts"
 		err = os.MkdirAll(chartDir, 0755)
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "dashboard.html", gin.H{
+				"error": "Gagal membuat folder chart. Silakan coba lagi nanti.",
+			})
 			return
 		}
 
 		chartFile := fmt.Sprintf("./public/charts/chart_%d.png", year)
 		f, err := os.Create(chartFile)
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "dashboard.html", gin.H{
+				"error": "Gagal membuat file chart. Silakan coba lagi nanti.",
+			})
 			return
 		}
 		defer f.Close()
@@ -426,7 +438,9 @@ func main() {
 		var total, ontime, late int
 		err = db.QueryRow(queryPercentage, year).Scan(&total, &ontime, &late)
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "dashboard.html", gin.H{
+				"error": "Gagal memuat persentase ontime/late. Silakan coba lagi nanti.",
+			})
 			return
 		}
 
@@ -448,7 +462,9 @@ func main() {
 		var totalPenalty float64
 		err = db.QueryRow(queryPenalty).Scan(&totalPenalty)
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "dashboard.html", gin.H{
+				"error": "Gagal memuat total penalty. Silakan coba lagi nanti.",
+			})
 			return
 		}
 
@@ -462,6 +478,7 @@ func main() {
 			"Ontime":       pctOntime,
 			"Late":         pctLate,
 			"TotalPenalty": totalPenalty,
+			"error" : "",
 		})
 	})
 
