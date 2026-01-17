@@ -193,7 +193,7 @@ func main() {
 	//  ============== LOGIN ========================
 
 	app.GET("/login", func(ctx *gin.Context) {
-		ctx.HTML(http.StatusOK, "login.html", nil)
+		ctx.HTML(http.StatusOK, "login.html", nil)		
 	})
 
 	app.POST("/login", func(ctx *gin.Context) {
@@ -250,7 +250,10 @@ func main() {
 				})
 				return
 			}
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "login.html", gin.H{
+				"error": "Terjadi kesalahan server. Silakan coba lagi.",
+				"email": email,
+			})
 			return
 		}
 
@@ -298,7 +301,7 @@ func main() {
 	})
 	// =============== FORBIDDIN =========================
 	app.GET("/forbidden", func(ctx *gin.Context) {
-		ctx.HTML(http.StatusForbidden, "forbidden.html", gin.H{
+	  ctx.HTML(http.StatusForbidden, "forbidden.html", gin.H{
         "error": "Akses ditolak: Anda bukan admin",
   	  })
 	})
@@ -479,8 +482,9 @@ func main() {
 			"Late":         pctLate,
 			"TotalPenalty": totalPenalty,
 			"error" : "",
-		})
+		})		
 	})
+
 
 	// ================= Categories ================
 
@@ -496,19 +500,35 @@ func main() {
 
 		rows, err := db.Query("SELECT id,name FROM categories WHERE name LIKE ? ORDER BY id ASC LIMIT ? OFFSET ? ", formatSearch, limit, offset)
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "categories_admin.html", gin.H{
+				"Categories": []Categories{},
+				"Search":     search,
+				"Total":      0,
+				"Pages":      []int{},
+				"Page":       page,
+				"error":      "Gagal mengambil data kategori: " + err.Error(),
+			})
 			return
 		}
 
 		var total int
 		err = db.QueryRow("SELECT Count(*) as total FROM categories WHERE name LIKE ?", formatSearch).Scan(&total)
 		if err != nil {
-			if err == sql.ErrNoRows {
-				ctx.String(http.StatusNotFound, "Category Not Found")
-				return
+			errMsg := "Terjadi kesalahan"
+			if err == sql.ErrNoRows {	
+				errMsg = "Kategori tidak ditemukan"
 			} else {
-				ctx.String(http.StatusInternalServerError, err.Error())
+				errMsg = err.Error()
+				
 			}
+			ctx.HTML(http.StatusOK, "categories_admin.html", gin.H{
+				"Categories": []Categories{},
+				"Search":     search,
+				"Total":      0,
+				"Pages":      []int{},
+				"Page":       page,
+				"error":      errMsg,
+			})
 			return
 		}
 
@@ -517,7 +537,14 @@ func main() {
 		for rows.Next() {
 			var cat Categories
 			if err := rows.Scan(&cat.ID, &cat.Name); err != nil {
-				ctx.String(http.StatusInternalServerError, err.Error())
+				ctx.HTML(http.StatusInternalServerError, "categories_admin.html", gin.H{
+					"Categories": categories,
+					"Search":     search,
+					"Total":      total,
+					"Pages":      []int{},
+					"Page":       page,
+					"error":      "Gagal membaca data kategori: " + err.Error(),
+				})
 				return
 			}
 			cat.Index = i
@@ -528,6 +555,7 @@ func main() {
 		totalPage := int(math.Ceil(float64(total) / float64(limit)))
 		if page > totalPage && totalPage != 0 {
 			ctx.Redirect(http.StatusFound, fmt.Sprintf("bookings?page=%d&search=%s", totalPage, url.QueryEscape(search)))
+			return
 		}
 		pages := make([]int, totalPage)
 		for i := 0; i < totalPage; i++ {
@@ -540,7 +568,7 @@ func main() {
 			"Total":      total,
 			"Pages":      pages,
 			"Page":       page,
-		})
+		})		
 	})
 
 	app.GET("/categories/create", AuthMiddleware, AdminOnly, func(ctx *gin.Context) {
@@ -557,24 +585,31 @@ func main() {
 		page := ctx.PostForm("page")
 		search := ctx.PostForm("search")
 
+		name = strings.TrimSpace(name)
+		if name == "" {
+			ctx.HTML(http.StatusBadRequest, "create_categories.html", gin.H{
+				"error": "Nama kategori tidak boleh kosong",
+			})
+			return
+		}
+
 		results, err := db.Exec("INSERT INTO categories (name) VALUES (?)", name)
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "create_categories.html", gin.H{
+				"error": "Terjadi kesalahan saat membuat kategori: " + err.Error(),
+			})
 			return
 		}
 
 		row, err := results.RowsAffected()
-		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
-			return
-		}
-		if row == 0 {
-			ctx.String(http.StatusInternalServerError, "Failed to Create Category")
+		if err != nil || row == 0 {
+			ctx.HTML(http.StatusInternalServerError, "create_categories.html", gin.H{
+				"error": "Gagal membuat kategori",
+			})
 			return
 		}
 
 		ctx.Redirect(http.StatusFound, "/categories?page="+page+"&search="+search)
-
 	})
 
 	app.GET("/categories/update/:id", AuthMiddleware, AdminOnly, func(ctx *gin.Context) {
@@ -587,10 +622,23 @@ func main() {
 		err := db.QueryRow("SELECT id,name FROM categories WHERE id = ?", id).Scan(&cat.ID, &cat.Name)
 		if err != nil {
 			if err == sql.ErrNoRows {
-				ctx.String(http.StatusNotFound, "Category Not Found")
-				return
+				ctx.HTML(http.StatusNotFound, "categories_admin.html", gin.H{
+					"Categories": []Categories{}, // list kosong
+					"Pages":      []int{},
+					"Page":       page,
+					"Search":     search,
+					"Total":      0,
+					"error":      "Kategori tidak ditemukan",
+				})
 			} else {
-				ctx.String(http.StatusInternalServerError, err.Error())
+				ctx.HTML(http.StatusInternalServerError, "categories_admin.html", gin.H{
+					"Categories": []Categories{},
+					"Pages":      []int{},
+					"Page":       page,
+					"Search":     search,
+					"Total":      0,
+					"error":      "Terjadi kesalahan: " + err.Error(),
+				})
 			}
 			return
 		}
@@ -608,18 +656,25 @@ func main() {
 		page := ctx.PostForm("page")
 		search := ctx.PostForm("search")
 
+		if strings.TrimSpace(name) == "" {
+			ctx.HTML(http.StatusBadRequest, "update_categories.html", gin.H{
+				"error":    "Nama kategori wajib diisi",
+			})
+			return
+		}
+
 		result, err := db.Exec("UPDATE categories SET name = ? WHERE id = ? ", name, id)
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "update_categories.html", gin.H{
+				"error": "Terjadi kesalahan: " + err.Error(),
+			})
 			return
 		}
 		rows, err := result.RowsAffected()
-		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
-			return
-		}
-		if rows == 0 {
-			ctx.String(http.StatusInternalServerError, "Failed to Update Category")
+		if err != nil || rows == 0 {
+			ctx.HTML(http.StatusInternalServerError, "update_categories.html", gin.H{
+				"error": "Gagal memperbarui kategori, coba lagi",
+			})
 			return
 		}
 		ctx.Redirect(http.StatusFound, "/categories?page="+page+"&search="+search)
@@ -632,16 +687,22 @@ func main() {
 
 		result, err := db.Exec("DELETE FROM categories WHERE id=?", id)
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "categories_admin.html", gin.H{
+				"error": "Gagal menghapus kategori: " + err.Error(),
+			})
 			return
 		}
 		row, err := result.RowsAffected()
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "categories_admin.html", gin.H{
+				"error":  "Terjadi kesalahan saat memproses penghapusan",
+			})
 			return
 		}
 		if row == 0 {
-			ctx.String(http.StatusInternalServerError, "Failed to Delete Category")
+			ctx.HTML(http.StatusBadRequest, "categories_admin.html", gin.H{
+				"error": "Kategori tidak ditemukan atau sudah dihapus",
+			})
 			return
 		}
 
