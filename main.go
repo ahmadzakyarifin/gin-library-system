@@ -1508,7 +1508,9 @@ func main() {
 
 			rows, err := db.Query(queryUser, formatSearch, limit, offset)
 			if err != nil {
-				ctx.String(http.StatusInternalServerError, err.Error())
+				ctx.HTML(http.StatusInternalServerError, "bookings_user.html", gin.H{
+					"error": "Gagal mengambil data user",
+				})
 				return
 			}
 			defer rows.Close()
@@ -1518,7 +1520,9 @@ func main() {
 			for rows.Next() {
 				var u User
 				if err := rows.Scan(&u.ID, &u.Name); err != nil {
-					ctx.String(http.StatusInternalServerError, err.Error())
+					ctx.HTML(http.StatusInternalServerError, "bookings_user.html", gin.H{
+						"error": "Gagal memproses data user",
+					})
 					return
 				}
 				u.Index = i
@@ -1529,13 +1533,16 @@ func main() {
 			var count CountsUser
 			err = db.QueryRow(countsUser, formatSearch).Scan(&count.CountUser)
 			if err != nil {
-				ctx.String(http.StatusInternalServerError, err.Error())
+				ctx.HTML(http.StatusInternalServerError, "bookings_user.html", gin.H{
+					"error": "Gagal menghitung data user",
+				})
 				return
 			}
 
 			totalPage := int(math.Ceil(float64(count.CountUser) / float64(limit)))
 			if page > totalPage && totalPage != 0 {
 				ctx.Redirect(http.StatusFound, fmt.Sprintf("bookings?page=%d&search=%s", totalPage, url.QueryEscape(search)))
+				return
 			}
 			pages := make([]int, totalPage)
 			for i := 0; i < totalPage; i++ {
@@ -1569,7 +1576,9 @@ func main() {
 
 			rows, err := db.Query(queryBook, formatSearch, limit, offset)
 			if err != nil {
-				ctx.String(http.StatusInternalServerError, err.Error())
+				ctx.HTML(http.StatusInternalServerError, "bookings_book.html", gin.H{
+					"error": "Gagal mengambil data buku",
+				})
 				return
 			}
 			defer rows.Close()
@@ -1579,7 +1588,9 @@ func main() {
 			for rows.Next() {
 				var b Book
 				if err := rows.Scan(&b.ID, &b.Title); err != nil {
-					ctx.String(http.StatusInternalServerError, err.Error())
+					ctx.HTML(http.StatusInternalServerError, "bookings_book.html", gin.H{
+						"error": "Gagal memproses data buku",
+					})
 					return
 				}
 				b.Index = i
@@ -1590,13 +1601,16 @@ func main() {
 			var count BooksCount
 			err = db.QueryRow(countBook, formatSearch).Scan(&count.BookCount)
 			if err != nil {
-				ctx.String(http.StatusInternalServerError, err.Error())
+				ctx.HTML(http.StatusInternalServerError, "bookings_book.html", gin.H{
+					"error": "Gagal menghitung data buku",
+				})
 				return
 			}
 
 			totalPage := int(math.Ceil(float64(count.BookCount) / float64(limit)))
 			if page > totalPage && totalPage != 0 {
 				ctx.Redirect(http.StatusFound, fmt.Sprintf("bookings?page=%d&search=%s", totalPage, url.QueryEscape(search)))
+				return
 			}
 			pages := make([]int, totalPage)
 			for i := 0; i < totalPage; i++ {
@@ -1642,7 +1656,9 @@ func main() {
 
 			rows, err := db.Query(query, argsQuery...)
 			if err != nil {
-				ctx.String(http.StatusInternalServerError, err.Error())
+				ctx.HTML(http.StatusInternalServerError, "bookings.html", gin.H{
+					"error": "Gagal mengambil data booking",
+				})
 				return
 			}
 			defer rows.Close()
@@ -1653,7 +1669,9 @@ func main() {
 			for rows.Next() {
 				var bo BookingDetail
 				if err := rows.Scan(&bo.ID, &bo.UserName, &bo.BookTitles, &bo.StartDate, &bo.EndDate, &bo.ActualReturnDate); err != nil {
-					ctx.String(http.StatusInternalServerError, err.Error())
+					ctx.HTML(http.StatusInternalServerError, "bookings.html", gin.H{
+						"error": "Gagal memproses data booking",
+					})
 					return
 				}
 				bo.StartStr = bo.StartDate.In(location).Format("02 January 2006")
@@ -1669,13 +1687,16 @@ func main() {
 			var count BookingCount
 			err = db.QueryRow(countBookings, formatSearch, formatSearch).Scan(&count.BookingCount)
 			if err != nil {
-				ctx.String(http.StatusInternalServerError, err.Error())
+				ctx.HTML(http.StatusInternalServerError, "bookings.html", gin.H{
+					"error": "Gagal menghitung data booking",
+				})
 				return
 			}
 
 			totalPage := int(math.Ceil(float64(count.BookingCount) / float64(limit)))
 			if page > totalPage && totalPage != 0 {
 				ctx.Redirect(http.StatusFound, fmt.Sprintf("bookings?page=%d&search=%s", totalPage, url.QueryEscape(search)))
+				return
 			}
 
 			pages := make([]int, totalPage)
@@ -1726,7 +1747,9 @@ func main() {
 
 		rowsUser, err := db.Query(queryUser)
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "create_bookings.html", gin.H{
+				"error": "Gagal mengambil data user",
+			})
 			return
 		}
 		defer rowsUser.Close()
@@ -1735,7 +1758,9 @@ func main() {
 		for rowsUser.Next() {
 			var u User
 			if err := rowsUser.Scan(&u.ID, &u.Name, &u.IsActive, &u.IsBorrowed); err != nil {
-				ctx.String(http.StatusInternalServerError, err.Error())
+				ctx.HTML(http.StatusInternalServerError, "create_bookings.html", gin.H{
+					"error": "Gagal memproses data user",
+				})
 				return
 			}
 			users = append(users, u)
@@ -1743,7 +1768,9 @@ func main() {
 
 		rowsBook, err := db.Query(queryBook)
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "create_bookings.html", gin.H{
+				"error": "Gagal mengambil data buku",
+			})
 			return
 		}
 		defer rowsBook.Close()
@@ -1752,7 +1779,9 @@ func main() {
 		for rowsBook.Next() {
 			var b Book
 			if err := rowsBook.Scan(&b.ID, &b.Title, &b.IsBorrowed); err != nil {
-				ctx.String(http.StatusInternalServerError, err.Error())
+				ctx.HTML(http.StatusInternalServerError, "create_bookings.html", gin.H{
+					"error": "Gagal memproses data buku",
+				})
 				return
 			}
 			books = append(books, b)
@@ -1781,18 +1810,24 @@ func main() {
 		search := ctx.PostForm("search")
 
 		if userIDStr == "" {
-			ctx.String(http.StatusBadRequest, "Select a user")
+			ctx.HTML(http.StatusBadRequest, "create_bookings.html", gin.H{
+				"error": "Silakan pilih user",
+			})
 			return
 		}
 
 		if len(bookIDsStr) == 0 {
-			ctx.String(http.StatusBadRequest, "Select at least one book")
+			ctx.HTML(http.StatusBadRequest, "create_bookings.html", gin.H{
+				"error": "Pilih minimal satu buku",
+			})
 			return
 		}
 
 		userID, err := strconv.Atoi(userIDStr)
 		if err != nil {
-			ctx.String(http.StatusBadRequest, "Invalid user_id")
+			ctx.HTML(http.StatusBadRequest, "create_bookings.html", gin.H{
+				"error": "User tidak valid",
+			})
 			return
 		}
 
@@ -1800,7 +1835,9 @@ func main() {
 		for _, bid := range bookIDsStr {
 			id, err := strconv.Atoi(bid)
 			if err != nil {
-				ctx.String(http.StatusBadRequest, "Invalid book_id")
+				ctx.HTML(http.StatusBadRequest, "create_bookings.html", gin.H{
+					"error": "ID buku tidak valid",
+				})
 				return
 			}
 			bookIDs = append(bookIDs, id)
@@ -1817,12 +1854,16 @@ func main() {
 		`, userID).Scan(&activeBorrows)
 
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "create_bookings.html", gin.H{
+				"error": "Gagal mengecek peminjaman user",
+			})
 			return
 		}
 
 		if activeBorrows+len(bookIDs) > 2 {
-			ctx.String(http.StatusBadRequest, "User cannot borrow more than 2 books at once")
+			ctx.HTML(http.StatusBadRequest, "create_bookings.html", gin.H{
+				"error": "User tidak boleh meminjam lebih dari 2 buku",
+			})
 			return
 		}
 
@@ -1832,39 +1873,41 @@ func main() {
 
 		result, err := db.Exec("INSERT INTO bookings (user_id, start_date, end_date) VALUES (?, ?, ?)", userID, startDate, endDate)
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "create_bookings.html", gin.H{
+				"error": "Gagal membuat booking",
+			})
 			return
 		}
 
 		row, err := result.RowsAffected()
-		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
-			return
-		}
-		if row == 0 {
-			ctx.String(http.StatusInternalServerError, "Failed to Create Bookings")
+		if err != nil || row == 0 {
+			ctx.HTML(http.StatusInternalServerError, "create_bookings.html", gin.H{
+				"error": "Booking tidak tersimpan",
+			})
 			return
 		}
 
 		bookingID, err := result.LastInsertId()
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "create_bookings.html", gin.H{
+				"error": "Gagal mendapatkan ID booking",
+			})
 			return
 		}
 
 		for _, bookID := range bookIDs {
 			result, err := db.Exec("INSERT INTO detail_bookings (book_id, booking_id) VALUES (?, ?)", bookID, bookingID)
 			if err != nil {
-				ctx.String(http.StatusInternalServerError, err.Error())
+				ctx.HTML(http.StatusInternalServerError, "create_bookings.html", gin.H{
+					"error": "Gagal menyimpan detail booking",
+				})
 				return
 			}
 			row, err := result.RowsAffected()
-			if err != nil {
-				ctx.String(http.StatusInternalServerError, err.Error())
-				return
-			}
-			if row == 0 {
-				ctx.String(http.StatusInternalServerError, "Failed to Into Detail Bookings")
+			if err != nil || row == 0 {
+				ctx.HTML(http.StatusInternalServerError, "create_bookings.html", gin.H{
+					"error": "Detail booking gagal disimpan",
+				})
 				return
 			}
 		}
@@ -1897,10 +1940,15 @@ func main() {
 		err := db.QueryRow(query, id).Scan(&bo.ID, &bo.UserName, &bo.StartDate, &bo.EndDate, &bo.ActualReturnDate, &bo.BookTitles)
 		if err != nil {
 			if err == sql.ErrNoRows {
-				ctx.String(http.StatusNotFound, "Bookings not found")
+				ctx.HTML(http.StatusNotFound, "return_bookings.html", gin.H{
+					"error": "Data booking tidak ditemukan",
+				})
 				return
 			}
-			ctx.String(http.StatusInternalServerError, err.Error())
+
+			ctx.HTML(http.StatusInternalServerError, "return_bookings.html", gin.H{
+				"error": "Gagal mengambil data booking",
+			})
 			return
 		}
 
@@ -1916,7 +1964,9 @@ func main() {
 		if err == sql.ErrNoRows {
 			fee = 0
 		} else if err != nil {
-			ctx.String(500, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "return_bookings.html", gin.H{
+				"error": "Gagal mengambil data denda",
+			})
 			return
 		}
 
@@ -1941,6 +1991,13 @@ func main() {
 		page := ctx.PostForm("page")
 		search := ctx.PostForm("search")
 
+		if bookingID == "" {
+			ctx.HTML(http.StatusBadRequest, "return_bookings.html", gin.H{
+				"error": "ID booking tidak valid",
+			})
+			return
+		}
+
 		if penalty == "" {
 			penalty = "0"
 		}
@@ -1948,14 +2005,23 @@ func main() {
 		location, _ := time.LoadLocation("Asia/Jakarta")
 		now := time.Now().In(location)
 
-		_, err := db.Exec(`
+		result, err := db.Exec(`
 				UPDATE bookings 
 				SET actual_return_date = ?, penalty_fee = ?
 				WHERE id = ?
 			`, now, penalty, bookingID)
 
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "return_bookings.html", gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+		row, err := result.RowsAffected()
+		if err != nil || row == 0 {
+			ctx.HTML(http.StatusInternalServerError, "return_bookings.html", gin.H{
+				"error": "Gagal mengembalikan buku",
+			})
 			return
 		}
 		redirectURL := "/bookings"
@@ -2006,7 +2072,9 @@ func main() {
 
 		rows, err := db.Query(query, id, formatSearch, limit, offset)
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "detail_user_admin.html", gin.H{
+				"error": err.Error(),
+			})
 			return
 		}
 		defer rows.Close()
@@ -2025,7 +2093,9 @@ func main() {
 				&bo.EndDate,
 				&bo.ActualReturnDate,
 			); err != nil {
-				ctx.String(http.StatusInternalServerError, err.Error())
+				ctx.HTML(http.StatusInternalServerError, "detail_user_admin.html", gin.H{
+					"error": err.Error(),
+				})
 				return
 			}
 
@@ -2042,10 +2112,18 @@ func main() {
 			bookings = append(bookings, bo)
 		}
 
+		if len(bookings) == 0 {
+			ctx.HTML(http.StatusNotFound, "detail_user_admin.html", gin.H{
+				"error": "Data peminjaman tidak ditemukan",
+			})
+			return
+		}
 		var count BookingCount
 		err = db.QueryRow(queryCount, id, formatSearch).Scan(&count.BookingCount)
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "detail_user_admin.html", gin.H{
+				"error": err.Error(),
+			})
 			return
 		}
 
@@ -2065,7 +2143,9 @@ func main() {
 		`
 		err = db.QueryRow(queryTotalBooks, id, formatSearch).Scan(&totalBooks)
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "detail_user_admin.html", gin.H{
+				"error": err.Error(),
+			})
 			return
 		}
 
@@ -2081,7 +2161,9 @@ func main() {
 		`
 		err = db.QueryRow(queryTotalFines, id, formatSearch).Scan(&totalFines)
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "detail_user_admin.html", gin.H{
+				"error": err.Error(),
+			})
 			return
 		}
 
@@ -2131,7 +2213,9 @@ func main() {
 
 		rows, err := db.Query(query, id, formatSearch, limit, offset)
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "detail_book_admin.html", gin.H{
+				"error": err.Error(),
+			})
 			return
 		}
 		defer rows.Close()
@@ -2149,7 +2233,10 @@ func main() {
 				&bo.EndDate,
 				&bo.ActualReturnDate,
 			); err != nil {
-				continue
+				ctx.HTML(http.StatusInternalServerError, "detail_book_admin.html", gin.H{
+					"error": err.Error(),
+				})
+				return
 			}
 
 			bo.StartStr = bo.StartDate.In(location).Format("02 January 2006")
@@ -2164,6 +2251,12 @@ func main() {
 			bo.Index = index
 			index++
 			bookings = append(bookings, bo)
+		}
+		if len(bookings) == 0 {
+			ctx.HTML(http.StatusNotFound, "detail_book_admin.html", gin.H{
+				"error": "Data peminjaman untuk buku ini tidak ditemukan",
+			})
+			return
 		}
 
 		queryStats := `
@@ -2181,7 +2274,9 @@ func main() {
 
 		err = db.QueryRow(queryStats, id, formatSearch).Scan(&totalTransactions, &totalFines)
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "detail_book_admin.html", gin.H{
+				"error": err.Error(),
+			})
 			return
 		}
 
