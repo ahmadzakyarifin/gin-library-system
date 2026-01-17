@@ -2310,7 +2310,10 @@ func main() {
 
 				setting.PenaltyFee = 0.00
 			} else {
-				ctx.String(http.StatusInternalServerError, err.Error())
+				ctx.HTML(http.StatusInternalServerError, "settings_admin.html", gin.H{
+					"Setting": setting,
+					"error":   "Terjadi kesalahan saat mengambil pengaturan",
+				})
 				return
 			}
 		}
@@ -2323,15 +2326,22 @@ func main() {
 	app.POST("/settings/update", AuthMiddleware, AdminOnly, func(ctx *gin.Context) {
 		feeStr := ctx.PostForm("penalty_fee")
 		fee, err := strconv.ParseFloat(feeStr, 64)
-		if err != nil {
-			ctx.String(http.StatusBadRequest, "Invalid fee")
+		if err != nil || fee < 0 {
+			ctx.HTML(http.StatusBadRequest, "settings_admin.html", gin.H{
+				"Error": "Penalty fee tidak valid",
+				"Setting": Settings{
+					PenaltyFee: 0,
+				},
+			})
 			return
 		}
 
 		var count int
 		err = db.QueryRow("SELECT COUNT(*) FROM settings").Scan(&count)
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "error.html", gin.H{
+				"Error": err.Error(),
+			})
 			return
 		}
 
@@ -2342,7 +2352,9 @@ func main() {
 		}
 
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "error.html", gin.H{
+				"Error": err.Error(),
+			})
 			return
 		}
 
