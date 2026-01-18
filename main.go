@@ -2933,8 +2933,38 @@ func main() {
 			})
 			return
 		}
-		claim := claimsInterface.(jwt.MapClaims)
-		userID := int(claim["id"].(float64))
+		claim, ok := claimsInterface.(jwt.MapClaims)
+		if !ok {
+			ctx.HTML(http.StatusUnauthorized, "bookings_in_user.html", gin.H{
+				"Count":   BooksCount{},
+				"Books":   []Book{},
+				"Pages":   []int{},
+				"Page":    page,
+				"Penalty": 0,
+				"Status":  "loan",
+				"error":   "Format token tidak valid",
+			})
+			return
+		}
+
+		var userID int
+		switch v := claim["id"].(type) {
+		case float64:
+			userID = int(v)
+		case string:
+			userID, _ = strconv.Atoi(v)
+		default:
+			ctx.HTML(http.StatusUnauthorized, "bookings_in_user.html", gin.H{
+				"Count":   BooksCount{},
+				"Books":   []Book{},
+				"Pages":   []int{},
+				"Page":    page,
+				"Penalty": 0,
+				"Status":  "loan",
+				"error":   "ID token tidak valid",
+			})
+			return
+		}
 
 		status := ctx.DefaultQuery("status", "loan")
 
