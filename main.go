@@ -2545,7 +2545,14 @@ func main() {
 			ORDER BY name
 		`)
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "home_user.html", gin.H{
+				"Categories":   []Categories{},
+				"Books":        []Book{},
+				"BookCategory": map[int][]Book{},
+				"Search":       search,
+				"SearchActive": false,
+				"error":        "Terjadi kesalahan saat mengambil kategori: " + err.Error(),
+			})
 			return
 		}
 		defer rows.Close()
@@ -2554,7 +2561,14 @@ func main() {
 		for rows.Next() {
 			var c Categories
 			if err := rows.Scan(&c.ID, &c.Name); err != nil {
-				ctx.String(http.StatusInternalServerError, err.Error())
+				ctx.HTML(http.StatusInternalServerError, "home_user.html", gin.H{
+					"Categories":   []Categories{},
+					"Books":        []Book{},
+					"BookCategory": map[int][]Book{},
+					"Search":       search,
+					"SearchActive": false,
+					"error":        "Terjadi kesalahan saat memproses kategori: " + err.Error(),
+				})
 				return
 			}
 			categories = append(categories, c)
@@ -2577,7 +2591,14 @@ func main() {
 		`
 		rows2, err := db.Query(queryBook, formatSearch)
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "home_user.html", gin.H{
+				"Categories":   categories,
+				"Books":        []Book{},
+				"BookCategory": map[int][]Book{},
+				"Search":       search,
+				"SearchActive": searchActive,
+				"error":        "Terjadi kesalahan saat mengambil buku: " + err.Error(),
+			})
 			return
 		}
 		defer rows2.Close()
@@ -2586,7 +2607,14 @@ func main() {
 		for rows2.Next() {
 			var b Book
 			if err := rows2.Scan(&b.ID, &b.Title, &b.Img, &b.CategoryId, &b.IsBorrowed); err != nil {
-				ctx.String(http.StatusInternalServerError, err.Error())
+				ctx.HTML(http.StatusInternalServerError, "home_user.html", gin.H{
+					"Categories":   categories,
+					"Books":        []Book{},
+					"BookCategory": map[int][]Book{},
+					"Search":       search,
+					"SearchActive": searchActive,
+					"error":        "Terjadi kesalahan saat memproses buku: " + err.Error(),
+				})
 				return
 			}
 			books = append(books, b)
@@ -2637,7 +2665,14 @@ func main() {
 
 		rows, err := db.Query(queryBook, categoryID, limit, offset)
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "all_book_user.html", gin.H{
+				"Books":      []Book{},
+				"Pages":      []int{},
+				"Page":       page,
+				"Search":     search,
+				"CategoryID": categoryID,
+				"error":      "Gagal mengambil buku: " + err.Error(),
+			})
 			return
 		}
 		defer rows.Close()
@@ -2646,7 +2681,14 @@ func main() {
 		for rows.Next() {
 			var b Book
 			if err := rows.Scan(&b.ID, &b.Title, &b.Img, &b.CategoryId, &b.CategoryName, &b.IsBorrowed); err != nil {
-				ctx.String(http.StatusInternalServerError, err.Error())
+				ctx.HTML(http.StatusInternalServerError, "all_book_user.html", gin.H{
+					"Books":      books,
+					"Pages":      []int{},
+					"Page":       page,
+					"Search":     search,
+					"CategoryID": categoryID,
+					"error":      "Gagal memproses data buku: " + err.Error(),
+				})
 				return
 			}
 			books = append(books, b)
@@ -2659,13 +2701,21 @@ func main() {
 		`
 		var count int
 		if err = db.QueryRow(queryBookCategory, categoryID).Scan(&count); err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "all_book_user.html", gin.H{
+				"Books":      books,
+				"Pages":      []int{},
+				"Page":       page,
+				"Search":     search,
+				"CategoryID": categoryID,
+				"error":      "Gagal menghitung total buku: " + err.Error(),
+			})
 			return
 		}
 
 		totalPage := int(math.Ceil(float64(count) / float64(limit)))
 		if page > totalPage && totalPage != 0 {
 			ctx.Redirect(http.StatusFound, fmt.Sprintf("bookings?page=%d&search=%s", totalPage, formatSearch))
+			return
 		}
 
 		pages := make([]int, totalPage)
@@ -2716,10 +2766,22 @@ func main() {
 		err := db.QueryRow(queryDetail, id).Scan(&book.ID, &book.Title, &book.Isbn, &book.Img, &book.CategoryName, &book.IsBorrowed)
 		if err != nil {
 			if err == sql.ErrNoRows {
-				ctx.String(http.StatusNotFound, "Book Not Found")
+				ctx.HTML(http.StatusNotFound, "view_detail_user.html", gin.H{
+					"Book":       Book{},
+					"Search":     search,
+					"CategoryID": categoryID,
+					"FromHome":   fromHome,
+					"error":      "Book not found",
+				})
 				return
 			}
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "view_detail_user.html", gin.H{
+				"Book":       Book{},
+				"Search":     search,
+				"CategoryID": categoryID,
+				"FromHome":   fromHome,
+				"error":      "Terjadi kesalahan: " + err.Error(),
+			})
 			return
 		}
 		ctx.HTML(http.StatusOK, "view_detail_user.html", gin.H{
@@ -2733,16 +2795,44 @@ func main() {
 	app.GET("settings_user", AuthMiddleware, func(ctx *gin.Context) {
 		claimInterface, exists := ctx.Get("Data")
 		if !exists {
-			ctx.String(http.StatusInternalServerError, "Failed to get user data")
+			ctx.HTML(http.StatusInternalServerError, "settings_user.html", gin.H{
+				"User":  User{},
+				"error": "Gagal mengambil data pengguna",
+			})
 			return
 		}
-		claim := claimInterface.(jwt.MapClaims)
-		userID := int(claim["id"].(float64))
+		claim, ok := claimInterface.(jwt.MapClaims)
+		if !ok {
+			ctx.HTML(http.StatusInternalServerError, "settings_user.html", gin.H{
+				"User":  User{},
+				"error": "Format data pengguna tidak valid",
+			})
+			return
+		}
+		userIDFloat, ok := claim["id"].(float64)
+		if !ok {
+			ctx.HTML(http.StatusInternalServerError, "settings_user.html", gin.H{
+				"User":  User{},
+				"error": "ID pengguna tidak ditemukan",
+			})
+			return
+		}
+		userID := int(userIDFloat)
 
 		var user User
 		err := db.QueryRow("SELECT id, name FROM users WHERE id = ?", userID).Scan(&user.ID, &user.Name)
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			if err == sql.ErrNoRows {
+				ctx.HTML(http.StatusNotFound, "settings_user.html", gin.H{
+					"User":  User{},
+					"error": "Pengguna tidak ditemukan",
+				})
+				return
+			}
+			ctx.HTML(http.StatusInternalServerError, "settings_user.html", gin.H{
+				"User":  User{},
+				"error": "Terjadi kesalahan: " + err.Error(),
+			})
 			return
 		}
 
@@ -2753,31 +2843,68 @@ func main() {
 
 	app.POST("/settings_user", AuthMiddleware, func(ctx *gin.Context) {
 		password := ctx.PostForm("password")
-		claimsInterface, exists := ctx.Get("Data")
-		if !exists {
-			ctx.String(http.StatusInternalServerError, "Failed to get user data")
+		if password == "" {
+			ctx.HTML(http.StatusBadRequest, "settings_user.html", gin.H{
+				"User":  User{},
+				"error": "Password tidak boleh kosong",
+			})
 			return
 		}
-		claim := claimsInterface.(jwt.MapClaims)
-		userID := int(claim["id"].(float64))
+		claimsInterface, exists := ctx.Get("Data")
+		if !exists {
+			ctx.HTML(http.StatusInternalServerError, "settings_user.html", gin.H{
+				"User":  User{},
+				"error": "Gagal mengambil data pengguna",
+			})
+			return
+		}
+		claim, ok := claimsInterface.(jwt.MapClaims)
+		if !ok {
+			ctx.HTML(http.StatusInternalServerError, "settings_user.html", gin.H{
+				"User":  User{},
+				"error": "Format data pengguna tidak valid",
+			})
+			return
+		}
+		userIDFloat, ok := claim["id"].(float64)
+		if !ok {
+			ctx.HTML(http.StatusInternalServerError, "settings_user.html", gin.H{
+				"User":  User{},
+				"error": "ID pengguna tidak valid",
+			})
+			return
+		}
+		userID := int(userIDFloat)
 
 		hashedPasword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "settings_user.html", gin.H{
+				"User":  User{},
+				"error": "Gagal mengenkripsi password: " + err.Error(),
+			})
 			return
 		}
 		result, err := db.Exec("UPDATE users SET password = ? WHERE id = ?", string(hashedPasword), userID)
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "settings_user.html", gin.H{
+				"User":  User{},
+				"error": "Gagal memperbarui password: " + err.Error(),
+			})
 			return
 		}
 		row, err := result.RowsAffected()
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "settings_user.html", gin.H{
+				"User":  User{},
+				"error": "Gagal mengecek hasil update: " + err.Error(),
+			})
 			return
 		}
 		if row == 0 {
-			ctx.String(http.StatusInternalServerError, "Failed to Update Password")
+			ctx.HTML(http.StatusInternalServerError, "settings_user.html", gin.H{
+				"User":  User{},
+				"error": "Password gagal diperbarui",
+			})
 			return
 		}
 
@@ -2795,7 +2922,15 @@ func main() {
 
 		claimsInterface, exists := ctx.Get("Data")
 		if !exists {
-			ctx.String(http.StatusInternalServerError, "Failed to get user data")
+			ctx.HTML(http.StatusInternalServerError, "bookings_in_user.html", gin.H{
+				"Count":   BooksCount{},
+				"Books":   []Book{},
+				"Pages":   []int{},
+				"Page":    page,
+				"Penalty": 0,
+				"Status":  "loan",
+				"error":   "Gagal mengambil data pengguna",
+			})
 			return
 		}
 		claim := claimsInterface.(jwt.MapClaims)
@@ -2820,7 +2955,15 @@ func main() {
 		err := db.QueryRow(queryCount, userID).
 			Scan(&count.BookBorrowed, &count.BookAvailable)
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "bookings_in_user.html", gin.H{
+				"Count":   BooksCount{},
+				"Books":   []Book{},
+				"Pages":   []int{},
+				"Page":    page,
+				"Penalty": 0,
+				"Status":  status,
+				"error":   "Gagal menghitung buku: " + err.Error(),
+			})
 			return
 		}
 
@@ -2834,7 +2977,15 @@ func main() {
 		var countPenalty float64
 		err = db.QueryRow(queryPenalty, userID).Scan(&countPenalty)
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "bookings_in_user.html", gin.H{
+				"Count":   count,
+				"Books":   []Book{},
+				"Pages":   []int{},
+				"Page":    page,
+				"Penalty": 0,
+				"Status":  status,
+				"error":   "Gagal menghitung denda: " + err.Error(),
+			})
 			return
 		}
 
@@ -2861,7 +3012,15 @@ func main() {
 
 		rows, err := db.Query(queryBorrow, userID, limit, offset)
 		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "bookings_in_user.html", gin.H{
+				"Count":   count,
+				"Books":   []Book{},
+				"Pages":   []int{},
+				"Page":    page,
+				"Penalty": countPenalty,
+				"Status":  status,
+				"error":   "Gagal mengambil daftar buku: " + err.Error(),
+			})
 			return
 		}
 		defer rows.Close()
@@ -2870,7 +3029,15 @@ func main() {
 		for rows.Next() {
 			var b Book
 			if err := rows.Scan(&b.ID, &b.Title, &b.Img); err != nil {
-				ctx.String(http.StatusInternalServerError, err.Error())
+				ctx.HTML(http.StatusInternalServerError, "bookings_in_user.html", gin.H{
+					"Count":   count,
+					"Books":   []Book{},
+					"Pages":   []int{},
+					"Page":    page,
+					"Penalty": countPenalty,
+					"Status":  status,
+					"error":   "Gagal membaca data buku: " + err.Error(),
+				})
 				return
 			}
 			books = append(books, b)
@@ -2907,7 +3074,12 @@ func main() {
 
 		claimsInterface, exists := ctx.Get("Data")
 		if !exists {
-			ctx.String(http.StatusInternalServerError, "Failed to get user data")
+			ctx.HTML(http.StatusInternalServerError, "details_book_in_user.html", gin.H{
+				"Book":   BookDetail{},
+				"Page":   page,
+				"Status": status,
+				"error":  "Gagal mengambil data pengguna",
+			})
 			return
 		}
 		claims := claimsInterface.(jwt.MapClaims)
@@ -2949,10 +3121,20 @@ func main() {
 		)
 		if err != nil {
 			if err == sql.ErrNoRows {
-				ctx.String(http.StatusNotFound, "Booking not found")
+				ctx.HTML(http.StatusNotFound, "details_book_in_user.html", gin.H{
+					"Book":   BookDetail{},
+					"Page":   page,
+					"Status": status,
+					"error":  "Booking tidak ditemukan",
+				})
 				return
 			}
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.HTML(http.StatusInternalServerError, "details_book_in_user.html", gin.H{
+				"Book":   BookDetail{},
+				"Page":   page,
+				"Status": status,
+				"error":  "Terjadi kesalahan: " + err.Error(),
+			})
 			return
 		}
 

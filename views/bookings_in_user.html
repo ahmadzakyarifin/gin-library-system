@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,13 +8,23 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
         @supports not ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
-            .backdrop-blur-lg { background-color: rgba(255, 255, 255, 0.85); }
+            .backdrop-blur-lg {
+                background-color: rgba(255, 255, 255, 0.85);
+            }
         }
     </style>
 </head>
+
 <body class="min-h-screen bg-[url('/img/background.svg')] bg-no-repeat bg-center bg-cover font-sans">
 
     <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-lg shadow-md">
@@ -24,18 +35,25 @@
                 </div>
                 <div class="flex items-center gap-6">
                     <div class="hidden lg:flex items-center gap-2 bg-gray-100 p-1 rounded-xl">
-                        <a href="/home" class="font-semibold text-gray-500 hover:bg-white hover:text-blue-600 px-4 py-2 rounded-lg transition">Home</a>
-                        <a href="/bookings_in_user" class="font-semibold bg-white text-blue-600 px-4 py-2 rounded-lg shadow-sm transition">Bookings</a>
+                        <a href="/home"
+                            class="font-semibold text-gray-500 hover:bg-white hover:text-blue-600 px-4 py-2 rounded-lg transition">Home</a>
+                        <a href="/bookings_in_user"
+                            class="font-semibold bg-white text-blue-600 px-4 py-2 rounded-lg shadow-sm transition">Bookings</a>
                     </div>
                     <div class="flex lg:hidden items-center gap-5">
-                        <a href="/home" class="text-2xl text-gray-500 hover:text-blue-600"><i class="bi bi-house-door-fill"></i></a>
-                        <a href="/bookings_in_user" class="text-2xl text-blue-600"><i class="bi bi-journal-check"></i></a>
+                        <a href="/home" class="text-2xl text-gray-500 hover:text-blue-600"><i
+                                class="bi bi-house-door-fill"></i></a>
+                        <a href="/bookings_in_user" class="text-2xl text-blue-600"><i
+                                class="bi bi-journal-check"></i></a>
                     </div>
                     <div class="flex items-center gap-6">
-                        <a href="/settings_user" class="text-2xl text-gray-600 hover:text-blue-600"><i class="bi bi-gear-fill"></i></a>
+                        <a href="/settings_user" class="text-2xl text-gray-600 hover:text-blue-600"><i
+                                class="bi bi-gear-fill"></i></a>
                         <form action="/logout" method="POST">
-                            <button type="submit" class="hidden lg:flex bg-red-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-red-600 transition">Logout</button>
-                            <button type="submit" class="lg:hidden text-2xl text-red-500 hover:text-red-600"><i class="bi bi-box-arrow-right"></i></button>
+                            <button type="submit"
+                                class="hidden lg:flex bg-red-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-red-600 transition">Logout</button>
+                            <button type="submit" class="lg:hidden text-2xl text-red-500 hover:text-red-600"><i
+                                    class="bi bi-box-arrow-right"></i></button>
                         </form>
                     </div>
                 </div>
@@ -45,17 +63,25 @@
 
     <main class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-12">
         <section class="bg-white/30 backdrop-blur-lg rounded-3xl shadow-2xl p-6 md:p-10">
+            {{ if .error }}
+            <div class="mb-6 flex items-center gap-3 rounded-xl bg-red-100 text-red-700 px-4 py-3">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <span class="text-sm font-medium">{{ .error }}</span>
+            </div>
+            {{ end }}
             <h2 class="text-3xl font-bold text-gray-800 mb-6">My Bookings Dashboard</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div class="bg-white/80 backdrop-blur-md rounded-2xl p-6 flex items-center gap-4 shadow-lg">
-                    <div class="bg-blue-100 text-blue-600 p-3 rounded-xl"><i class="bi bi-journal-arrow-up text-2xl"></i></div>
+                    <div class="bg-blue-100 text-blue-600 p-3 rounded-xl"><i
+                            class="bi bi-journal-arrow-up text-2xl"></i></div>
                     <div>
                         <p class="text-gray-600 font-semibold">Active Loans</p>
                         <p class="text-3xl font-bold text-gray-800">{{.Count.BookBorrowed}}</p>
                     </div>
                 </div>
                 <div class="bg-white/80 backdrop-blur-md rounded-2xl p-6 flex items-center gap-4 shadow-lg">
-                    <div class="bg-green-100 text-green-600 p-3 rounded-xl"><i class="bi bi-journal-check text-2xl"></i></div>
+                    <div class="bg-green-100 text-green-600 p-3 rounded-xl"><i class="bi bi-journal-check text-2xl"></i>
+                    </div>
                     <div>
                         <p class="text-gray-600 font-semibold">Books Returned</p>
                         <p class="text-3xl font-bold text-gray-800">{{.Count.BookAvailable}}</p>
@@ -72,14 +98,14 @@
 
             <div class="mb-8">
                 <div class="flex bg-gray-100 p-1 rounded-xl w-full max-w-sm mx-auto">
-                    <a href="/bookings_in_user?status=loan" 
-                       class="flex-1 text-center font-semibold px-4 py-2 rounded-lg transition 
-                       {{if eq $.Status "loan"}}bg-white text-blue-600 shadow-sm{{else}}text-gray-500 hover:bg-white hover:text-blue-600{{end}}">
+                    <a href="/bookings_in_user?status=loan" class="flex-1 text-center font-semibold px-4 py-2 rounded-lg transition 
+                       {{if eq $.Status " loan"}}bg-white text-blue-600 shadow-sm{{else}}text-gray-500 hover:bg-white
+                        hover:text-blue-600{{end}}">
                         On Loan
                     </a>
-                    <a href="/bookings_in_user?status=returned" 
-                       class="flex-1 text-center font-semibold px-4 py-2 rounded-lg transition
-                       {{if eq $.Status "returned"}}bg-white text-blue-600 shadow-sm{{else}}text-gray-500 hover:bg-white hover:text-blue-600{{end}}">
+                    <a href="/bookings_in_user?status=returned" class="flex-1 text-center font-semibold px-4 py-2 rounded-lg transition
+                       {{if eq $.Status " returned"}}bg-white text-blue-600 shadow-sm{{else}}text-gray-500
+                        hover:bg-white hover:text-blue-600{{end}}">
                         Returned
                     </a>
                 </div>
@@ -88,12 +114,14 @@
             <div class="bg-white rounded-2xl shadow-lg overflow-hidden p-8 h-[800px] flex flex-col">
                 <div class="space-y-4 max-w-4xl mx-auto overflow-y-auto flex-1">
                     {{range .Books}}
-                    <div class="bg-white rounded-2xl p-6 flex items-center gap-6 border border-gray-200/80 shadow-md hover:bg-gray-50 transition-colors xl:w-[600px] md:w-[400px]  mx-auto min-h-[150px]">
-                        <img src="{{.Img}}" alt="{{.Title}}" class="w-24 h-36 object-cover rounded-lg shadow-md flex-shrink-0">
+                    <div
+                        class="bg-white rounded-2xl p-6 flex items-center gap-6 border border-gray-200/80 shadow-md hover:bg-gray-50 transition-colors xl:w-[600px] md:w-[400px]  mx-auto min-h-[150px]">
+                        <img src="{{.Img}}" alt="{{.Title}}"
+                            class="w-24 h-36 object-cover rounded-lg shadow-md flex-shrink-0">
                         <h3 class="font-bold text-lg text-gray-800 flex-1">{{.Title}}</h3>
-                        <a href="details_book_in_user/{{.ID}}?page={{$.Page}}&status={{$.Status}}" 
-                        class="bg-blue-500 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-600 transition-all text-sm">
-                        Details
+                        <a href="details_book_in_user/{{.ID}}?page={{$.Page}}&status={{$.Status}}"
+                            class="bg-blue-500 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-600 transition-all text-sm">
+                            Details
                         </a>
                     </div>
                     {{end}}
@@ -103,7 +131,7 @@
                     <nav class="flex flex-wrap gap-2 justify-center">
                         {{range .Pages}}
                         <a class="px-3 py-1 rounded-lg font-semibold transition 
-                            {{if eq $.Page .}}bg-blue-600 text-white{{else}}bg-gray-200 hover:bg-gray-300{{end}}" 
+                            {{if eq $.Page .}}bg-blue-600 text-white{{else}}bg-gray-200 hover:bg-gray-300{{end}}"
                             href="/bookings_in_user?page={{.}}&status={{$.Status}}">
                             {{.}}
                         </a>
@@ -119,4 +147,5 @@
     </footer>
 
 </body>
+
 </html>
