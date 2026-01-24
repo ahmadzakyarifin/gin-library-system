@@ -59,7 +59,7 @@ Silakan gunakan kode ini untuk referensi belajar, namun perlu diingat masih bany
 ### 🔐 Autentikasi & Keamanan
 | Halaman Login | Akses Ditolak (Forbidden) |
 | :---: | :---: |
-| ![Login Page](screenshots/login.png) | ![Forbidden Page](screenshots/forbidden.png) |
+| ![Login Page](screenshots/admin/login.png) | ![Forbidden Page](screenshots/admin/forbidden.png) |
 | *Portal Masuk (Admin & User)* | *Tampilan jika User biasa mencoba akses Admin* |
 
 ### 🛡️ Panel Admin
